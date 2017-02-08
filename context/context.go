@@ -2,9 +2,12 @@ package context
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"path"
+	"strings"
 
+	"github.com/ghodss/yaml"
 	"github.com/polydawn/meep"
 )
 
@@ -38,7 +41,17 @@ func LoadContextFromFile(filename string) (*Context, error) {
 
 	var c Context
 
-	err = json.Unmarshal(file, &c)
+	if strings.HasSuffix(filename, "json") {
+		err = json.Unmarshal(file, &c)
+	} else if strings.HasSuffix(filename, "yaml") || strings.HasSuffix(filename, "yml") {
+		err = yaml.Unmarshal(file, &c)
+	} else {
+		return nil, meep.New(
+			&ContextLoadingError{Filename: filename},
+			meep.Cause(fmt.Errorf("File format not supported. Must be JSON or YAML.")),
+		)
+	}
+
 	if err != nil {
 		return nil, meep.New(
 			&ContextLoadingError{Filename: filename},
