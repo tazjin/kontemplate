@@ -2,9 +2,10 @@ package context
 
 import (
 	"encoding/json"
-	"github.com/polydawn/meep"
 	"io/ioutil"
 	"path"
+
+	"github.com/polydawn/meep"
 )
 
 type ResourceSet struct {

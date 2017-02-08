@@ -24,37 +24,67 @@ type TemplatingError struct {
 	meep.AllTraits
 }
 
-func LoadAndPrepareTemplates(c *context.Context) ([]string, error) {
-	output := make([]string, 0)
-
+func LoadAndPrepareTemplates(limit *[]string, c *context.Context) (output []string, err error) {
 	for _, rs := range c.ResourceSets {
-		fmt.Fprintf(os.Stderr, "Loading resources for %s\n", rs.Name)
+		if resourceSetIncluded(limit, &rs.Name) {
+			err = processResourceSet(c, &rs, &output)
 
-		rp := path.Join(c.BaseDir, rs.Name)
-		files, err := ioutil.ReadDir(rp)
-
-		if err != nil {
-			return nil, meep.New(
-				&TemplateNotFoundError{Name: rs.Name},
-				meep.Cause(err),
-			)
-		}
-
-		for _, file := range files {
-			if !file.IsDir() && isResourceFile(file) {
-				p := path.Join(rp, file.Name())
-				o, err := templateFile(c, &rs, p)
-
-				if err != nil {
-					return nil, err
-				}
-
-				output = append(output, o)
+			if err != nil {
+				return
 			}
 		}
 	}
 
-	return output, nil
+	return
+}
+
+func resourceSetIncluded(limit *[]string, resourceSetName *string) bool {
+	if len(*limit) == 0 {
+		return true
+	}
+
+	for _, name := range *limit {
+		if name == *resourceSetName {
+			return true
+		}
+	}
+
+	return false
+}
+
+func processResourceSet(c *context.Context, rs *context.ResourceSet, output *[]string) error {
+	fmt.Fprintf(os.Stderr, "Loading resources for %s\n", rs.Name)
+
+	rp := path.Join(c.BaseDir, rs.Name)
+	files, err := ioutil.ReadDir(rp)
+
+	err = processFiles(c, rs, rp, files, output)
+
+	if err != nil {
+		return meep.New(
+			&TemplateNotFoundError{Name: rs.Name},
+			meep.Cause(err),
+		)
+	}
+
+	return nil
+}
+
+func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files []os.FileInfo, output *[]string) error {
+	for _, file := range files {
+		if !file.IsDir() && isResourceFile(file) {
+			p := path.Join(rp, file.Name())
+			o, err := templateFile(c, rs, p)
+
+			if err != nil {
+				return err
+			}
+
+			*output = append(*output, o)
+		}
+	}
+
+	return nil
 }
 
 func templateFile(c *context.Context, rs *context.ResourceSet, filename string) (string, error) {

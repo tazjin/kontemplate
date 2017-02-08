@@ -4,36 +4,70 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/polydawn/meep"
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/templater"
+	"github.com/urfave/cli"
 )
 
 func main() {
-	args := os.Args[1:]
-	if len(args) == 0 {
-		fmt.Fprintln(os.Stderr, "Usage: kontemplate <cluster-config>")
-		os.Exit(1)
+	app := cli.NewApp()
+
+	app.Name = "kontemplate"
+	app.Usage = "simple Kubernetes resource templating"
+	app.Version = "0.0.1"
+
+	app.Commands = []cli.Command{
+		ApplyCommand(),
 	}
 
-	c, err := context.LoadContextFromFile(os.Args[1])
+	app.Run(os.Args)
+}
 
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
-		os.Exit(1)
-	}
+func ApplyCommand() cli.Command {
+	return cli.Command{
+		Name:  "run",
+		Usage: "Interpolate and print templates",
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "file, f",
+				Usage: "Cluster configuration file to use",
+			},
+			cli.StringSliceFlag{
+				Name:  "limit, l",
+				Usage: "Limit templating to certain resource sets",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			limit := c.StringSlice("limit")
+			f := c.String("file")
 
-	fmt.Fprintf(os.Stderr, "Applying cluster %s\n", c.Name)
+			if f == "" {
+				return meep.New(
+					&meep.ErrInvalidParam{
+						Param:  "file",
+						Reason: "Cluster config file must be specified",
+					},
+				)
+			}
 
-	for _, rs := range c.ResourceSets {
-		fmt.Fprintf(os.Stderr, "Applying resource %s with values %v\n", rs.Name, rs.Values)
-		resources, err := templater.LoadAndPrepareTemplates(c)
+			ctx, err := context.LoadContextFromFile(f)
 
-		if err != nil {
-			fmt.Println(err)
-		}
+			if err != nil {
+				return err
+			}
 
-		for _, r := range resources {
-			fmt.Print(r)
-		}
+			resources, err := templater.LoadAndPrepareTemplates(&limit, ctx)
+
+			if err != nil {
+				return err
+			}
+
+			for _, r := range resources {
+				fmt.Println(r)
+			}
+
+			return nil
+		},
 	}
 }
