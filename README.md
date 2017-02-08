@@ -39,6 +39,23 @@ include:
 
 Those values are then templated into the resource files of `some-api`.
 
+## Installation
+
+Assuming you have Go configured correctly, you can simply `go get github.com/tazjin/kontemplate/...`.
+
 ## Usage
 
-You must have `kubectl` installed to use KonTemplate.
+You must have `kubectl` installed to use KonTemplate effectively.
+
+At the moment KonTemplate will simply output the templated Kubernetes resource files, which can
+then be piped into `kubectl`:
+
+```
+# Look at output and check to see if it's correct ...
+kontemplate run -f example/prod-cluster.yaml -l some-api
+
+# ... if it is, go ahead and apply it
+kontemplate run -f example/prod-cluster.yaml -l some-api | kubectl apply -f -
+
+# That's it!
+```
