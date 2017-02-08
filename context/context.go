@@ -80,6 +80,7 @@ func flattenResourceSetCollections(rs *[]ResourceSet) *[]ResourceSet {
 		} else {
 			for _, subResourceSet := range r.Include {
 				subResourceSet.Parent = &r.Name
+				subResourceSet.Name = path.Join(r.Name, subResourceSet.Name)
 				flattened = append(flattened, subResourceSet)
 			}
 		}
