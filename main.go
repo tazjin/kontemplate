@@ -20,7 +20,7 @@ func main() {
 
 	app.Name = "kontemplate"
 	app.Usage = "simple Kubernetes resource templating"
-	app.Version = "0.0.1"
+	app.Version = "v1.0.0-beta1"
 
 	app.Commands = []cli.Command{
 		templateCommand(),
