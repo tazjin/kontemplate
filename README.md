@@ -47,6 +47,18 @@ Assuming you have Go configured correctly, you can simply `go get github.com/taz
 
 You must have `kubectl` installed to use KonTemplate effectively.
 
+```
+NAME:
+   kontemplate run - Interpolate and print templates
+
+USAGE:
+   kontemplate run [command options] [arguments...]
+
+OPTIONS:
+   --file value, -f value   Cluster configuration file to use
+   --limit value, -l value  Limit templating to certain resource sets
+```
+
 At the moment KonTemplate will simply output the templated Kubernetes resource files, which can
 then be piped into `kubectl`:
 
