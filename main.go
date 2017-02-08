@@ -26,6 +26,7 @@ func main() {
 		templateCommand(),
 		applyCommand(),
 		replaceCommand(),
+		deleteCommand(),
 	}
 
 	app.Run(os.Args)
@@ -104,6 +105,27 @@ func replaceCommand() cli.Command {
 			}
 
 			args := []string{"replace", "--save-config=true", "-f", "-"}
+			return runKubectlWithResources(ctx, &args, &resources)
+		},
+	}
+}
+
+func deleteCommand() cli.Command {
+	return cli.Command{
+		Name:  "delete",
+		Usage: "Interpolate templates and run 'kubectl delete'",
+		Flags: commonFlags(),
+		Action: func(c *cli.Context) error {
+			include := c.StringSlice("include")
+			exclude := c.StringSlice("exclude")
+			ctx, err := loadContext(c)
+			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
+
+			if err != nil {
+				return err
+			}
+
+			args := []string{"delete", "-f", "-"}
 			return runKubectlWithResources(ctx, &args, &resources)
 		},
 	}
