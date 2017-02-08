@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/templater"
@@ -22,10 +22,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Fprintf(os.Stderr,"Applying cluster %s\n", c.Name)
+	fmt.Fprintf(os.Stderr, "Applying cluster %s\n", c.Name)
 
 	for _, rs := range c.ResourceSets {
-		fmt.Fprintf(os.Stderr,"Applying resource %s with values %v\n", rs.Name, rs.Values)
+		fmt.Fprintf(os.Stderr, "Applying resource %s with values %v\n", rs.Name, rs.Values)
 		resources, err := templater.LoadAndPrepareTemplates(c)
 
 		if err != nil {

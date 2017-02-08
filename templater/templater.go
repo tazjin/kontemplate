@@ -1,16 +1,16 @@
 package templater
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
-	"strings"
 	"os"
 	"path"
+	"strings"
 	"text/template"
-	"bytes"
 
-	"github.com/tazjin/kontemplate/context"
 	"github.com/polydawn/meep"
+	"github.com/tazjin/kontemplate/context"
 )
 
 // Error that is caused by non-existent template files being specified
@@ -28,7 +28,7 @@ func LoadAndPrepareTemplates(c *context.Context) ([]string, error) {
 	output := make([]string, 0)
 
 	for _, rs := range c.ResourceSets {
-		fmt.Fprintf(os.Stderr,"Loading resources for %s\n", rs.Name)
+		fmt.Fprintf(os.Stderr, "Loading resources for %s\n", rs.Name)
 
 		rp := path.Join(c.BaseDir, rs.Name)
 		files, err := ioutil.ReadDir(rp)
@@ -39,7 +39,6 @@ func LoadAndPrepareTemplates(c *context.Context) ([]string, error) {
 				meep.Cause(err),
 			)
 		}
-
 
 		for _, file := range files {
 			if !file.IsDir() && isResourceFile(file) {

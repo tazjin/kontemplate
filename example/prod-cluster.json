@@ -1,7 +1,7 @@
 {
   "context": "k8s.prod.mydomain.com",
   "global": {
-    "globalTest": "lizards"
+    "globalVar": "lizards"
   },
   "include": [
     {

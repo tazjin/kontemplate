@@ -1,0 +1,34 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: some-api
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: some-api
+    spec:
+      containers:
+        - image: my.container.repo/some-api:{{ .version }}
+          name: some-api
+          env:
+            - name: ENABLE_IMPORTANT_FEATURE
+              value: {{ .importantFeature }}
+            - name: SOME_GLOBAL_VAR
+              value: {{ .globalVar }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: some-api
+  labels:
+    app: some-api
+spec:
+  selector:
+    app: some-api
+  ports:
+    - port: 80
+      targetPort: {{ .apiPort }}
+      name: http
