@@ -1,6 +1,8 @@
 KonTemplate - A simple Kubernetes templater
 ===========================================
 
+[![Build Status](https://travis-ci.org/tazjin/kontemplate.svg?branch=master)](https://travis-ci.org/tazjin/kontemplate)
+
 I made this tool out of frustration with the available ways to template Kubernetes resource files. All I want out of
 such a tool is a way to specify lots of resources with placeholders that get filled in with specific values, based on
 which context (i.e. k8s cluster) is specified.
