@@ -61,6 +61,7 @@ COMMANDS:
      template  Interpolate and print templates
      apply     Interpolate templates and run 'kubectl apply'
      replace   Interpolate templates and run 'kubectl replace'
+     delete    Interpolate templates and run 'kubectl delete'
      help, h   Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
