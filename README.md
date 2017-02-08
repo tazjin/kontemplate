@@ -49,25 +49,33 @@ You must have `kubectl` installed to use KonTemplate effectively.
 
 ```
 NAME:
-   kontemplate run - Interpolate and print templates
+   kontemplate - simple Kubernetes resource templating
 
 USAGE:
-   kontemplate run [command options] [arguments...]
+   kontemplate [global options] command [command options] [arguments...]
 
-OPTIONS:
-   --file value, -f value   Cluster configuration file to use
-   --limit value, -l value  Limit templating to certain resource sets
+VERSION:
+   0.0.1
+
+COMMANDS:
+     template  Interpolate and print templates
+     apply     Interpolate templates and run 'kubectl apply'
+     help, h   Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h     show help
+   --version, -v  print the version
 ```
 
-At the moment KonTemplate will simply output the templated Kubernetes resource files, which can
-then be piped into `kubectl`:
+Examples:
 
 ```
-# Look at output and check to see if it's correct ...
-kontemplate run -f example/prod-cluster.yaml -l some-api
+# Look at output for a specific resource set and check to see if it's correct ...
+kontemplate template -f example/prod-cluster.yaml -l some-api
 
-# ... if it is, go ahead and apply it
-kontemplate run -f example/prod-cluster.yaml -l some-api | kubectl apply -f -
+# ... maybe do a dry-run to see what kubectl would do:
+kontemplate apply -f example/prod-cluster.yaml --dry-run
 
-# That's it!
+# And actually apply it if you like what you see:
+kontemplate apply -f example/prod-cluster.yaml
 ```
