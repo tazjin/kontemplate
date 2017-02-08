@@ -37,9 +37,10 @@ func templateCommand() cli.Command {
 		Usage: "Interpolate and print templates",
 		Flags: commonFlags(),
 		Action: func(c *cli.Context) error {
-			limit := c.StringSlice("limit")
+			include := c.StringSlice("include")
+			exclude := c.StringSlice("exclude")
 			ctx, err := loadContext(c)
-			resources, err := templater.LoadAndPrepareTemplates(&limit, ctx)
+			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
 
 			if err != nil {
 				return err
@@ -66,9 +67,10 @@ func applyCommand() cli.Command {
 			Destination: &dryRun,
 		}),
 		Action: func(c *cli.Context) error {
-			limit := c.StringSlice("limit")
+			include := c.StringSlice("include")
+			exclude := c.StringSlice("exclude")
 			ctx, err := loadContext(c)
-			resources, err := templater.LoadAndPrepareTemplates(&limit, ctx)
+			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
 
 			if err != nil {
 				return err
@@ -92,9 +94,10 @@ func replaceCommand() cli.Command {
 		Usage: "Interpolate templates and run 'kubectl replace'",
 		Flags: commonFlags(),
 		Action: func(c *cli.Context) error {
-			limit := c.StringSlice("limit")
+			include := c.StringSlice("include")
+			exclude := c.StringSlice("exclude")
 			ctx, err := loadContext(c)
-			resources, err := templater.LoadAndPrepareTemplates(&limit, ctx)
+			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
 
 			if err != nil {
 				return err
@@ -140,8 +143,12 @@ func commonFlags() []cli.Flag {
 			Usage: "Cluster configuration file to use",
 		},
 		cli.StringSliceFlag{
-			Name:  "limit, l",
-			Usage: "Limit templating to certain resource sets",
+			Name:  "include, i",
+			Usage: "Limit templating to explicitly included resource sets",
+		},
+		cli.StringSliceFlag{
+			Name:  "exclude, e",
+			Usage: "Exclude certain resource sets from templating",
 		},
 	}
 }

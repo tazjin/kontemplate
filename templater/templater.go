@@ -26,32 +26,18 @@ type TemplatingError struct {
 	meep.AllTraits
 }
 
-func LoadAndPrepareTemplates(limit *[]string, c *context.Context) (output []string, err error) {
-	for _, rs := range c.ResourceSets {
-		if resourceSetIncluded(limit, &rs.Name) {
-			err = processResourceSet(c, &rs, &output)
+func LoadAndPrepareTemplates(include *[]string, exclude *[]string, c *context.Context) (output []string, err error) {
+	limitedResourceSets := applyLimits(&c.ResourceSets, include, exclude)
 
-			if err != nil {
-				return
-			}
+	for _, rs := range *limitedResourceSets {
+		err = processResourceSet(c, &rs, &output)
+
+		if err != nil {
+			return
 		}
 	}
 
 	return
-}
-
-func resourceSetIncluded(limit *[]string, resourceSetName *string) bool {
-	if len(*limit) == 0 {
-		return true
-	}
-
-	for _, name := range *limit {
-		if name == *resourceSetName {
-			return true
-		}
-	}
-
-	return false
 }
 
 func processResourceSet(c *context.Context, rs *context.ResourceSet, output *[]string) error {
@@ -123,6 +109,46 @@ func templateFile(c *context.Context, rs *context.ResourceSet, filename string) 
 	}
 
 	return b.String(), nil
+}
+
+// Applies the limits of explicitly included or excluded resources and returns the updated resource set.
+// Exclude takes priority over include
+func applyLimits(rs *[]context.ResourceSet, include *[]string, exclude *[]string) *[]context.ResourceSet {
+	if len(*include) == 0 && len(*exclude) == 0 {
+		return rs
+	}
+
+	// Exclude excluded resource sets
+	excluded := make([]context.ResourceSet, 0)
+	for _, r := range *rs {
+		if !contains(exclude, &r.Name) {
+			excluded = append(excluded, r)
+		}
+	}
+
+	// Include included resource sets
+	if len(*include) == 0 {
+		return &excluded
+	}
+	included := make([]context.ResourceSet, 0)
+	for _, r := range excluded {
+		if contains(include, &r.Name) {
+			included = append(included, r)
+		}
+	}
+
+	return &included
+}
+
+// Check whether a certain string is contained in a string slice
+func contains(s *[]string, v *string) bool {
+	for _, r := range *s {
+		if r == *v {
+			return true
+		}
+	}
+
+	return false
 }
 
 func templateFuncs() template.FuncMap {
