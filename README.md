@@ -13,7 +13,7 @@ KonTemplate lets you describe resources as you normally would in a simple folder
 
 ```
 .
-├── prod-cluster.json
+├── prod-cluster.yaml
 └── some-api
     ├── deployment.yaml
     └── service.yaml
@@ -22,23 +22,20 @@ KonTemplate lets you describe resources as you normally would in a simple folder
 This example has all resources belonging to `some-api` (no file naming conventions enforced at all!) in the `some-api`
 folder and the configuration for the cluster `prod-cluster` in the corresponding file.
 
-Lets take a short look at `prod-cluster.json`:
+Lets take a short look at `prod-cluster.yaml`:
 
-```json
-{
-  "context": "k8s.prod.mydomain.com",
-  "include": [
-    {
-      "name": "some-api",
-      "values": {
-        "importantFeature": true,
-        "apiPort": 4567
-      }
-    }
-  ]
-}
+```yaml
+---
+context: k8s.prod.mydomain.com
+global:
+  globalVar: lizards
+include:
+  - name: some-api
+    values:
+      version: 1.0-0e6884d
+      importantFeature: true
+      apiPort: 4567
 ```
-
 
 Those values are then templated into the resource files of `some-api`.
 
