@@ -99,6 +99,11 @@ func templateFile(c *context.Context, rs *context.ResourceSet, filename string) 
 
 	var b bytes.Buffer
 
+	// Guard against empty map before merging keys
+	if rs.Values == nil {
+		rs.Values = make(map[string]interface{}, 0)
+	}
+
 	// Merge global and resourceset-specific values (don't override from global)
 	for k, v := range c.Global {
 		if _, ok := rs.Values[k]; !ok {
