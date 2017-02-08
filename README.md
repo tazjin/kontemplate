@@ -60,6 +60,7 @@ VERSION:
 COMMANDS:
      template  Interpolate and print templates
      apply     Interpolate templates and run 'kubectl apply'
+     replace   Interpolate templates and run 'kubectl replace'
      help, h   Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
@@ -67,11 +68,20 @@ GLOBAL OPTIONS:
    --version, -v  print the version
 ```
 
+All options support the same set of extra flags:
+
+```
+OPTIONS:
+   --file value, -f value     Cluster configuration file to use
+   --include value, -i value  Limit templating to explicitly included resource sets
+   --exclude value, -e value  Exclude certain resource sets from templating
+```
+
 Examples:
 
 ```
 # Look at output for a specific resource set and check to see if it's correct ...
-kontemplate template -f example/prod-cluster.yaml -l some-api
+kontemplate template -f example/prod-cluster.yaml -i some-api
 
 # ... maybe do a dry-run to see what kubectl would do:
 kontemplate apply -f example/prod-cluster.yaml --dry-run
