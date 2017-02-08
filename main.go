@@ -25,6 +25,7 @@ func main() {
 	app.Commands = []cli.Command{
 		templateCommand(),
 		applyCommand(),
+		replaceCommand(),
 	}
 
 	app.Run(os.Args)
@@ -36,7 +37,9 @@ func templateCommand() cli.Command {
 		Usage: "Interpolate and print templates",
 		Flags: commonFlags(),
 		Action: func(c *cli.Context) error {
-			resources, err := templateResources(c)
+			limit := c.StringSlice("limit")
+			ctx, err := loadContext(c)
+			resources, err := templater.LoadAndPrepareTemplates(&limit, ctx)
 
 			if err != nil {
 				return err
@@ -63,42 +66,71 @@ func applyCommand() cli.Command {
 			Destination: &dryRun,
 		}),
 		Action: func(c *cli.Context) error {
-			resources, err := templateResources(c)
+			limit := c.StringSlice("limit")
+			ctx, err := loadContext(c)
+			resources, err := templater.LoadAndPrepareTemplates(&limit, ctx)
 
 			if err != nil {
 				return err
 			}
 
-			var kubectl *exec.Cmd
+			var args []string
 			if dryRun {
-				kubectl = exec.Command("kubectl", "apply", "-f", "-", "--dry-run")
+				args = []string{"apply", "-f", "-", "--dry-run"}
 			} else {
-				kubectl = exec.Command("kubectl", "apply", "-f", "-")
+				args = []string{"apply", "-f", "-"}
 			}
 
-			stdin, err := kubectl.StdinPipe()
-			if err != nil {
-				return meep.New(&KubeCtlError{}, meep.Cause(err))
-			}
-
-			kubectl.Stdout = os.Stdout
-			kubectl.Stderr = os.Stderr
-
-			if err = kubectl.Start(); err != nil {
-				return meep.New(&KubeCtlError{}, meep.Cause(err))
-			}
-
-			for _, r := range resources {
-				fmt.Fprintln(stdin, r)
-			}
-
-			stdin.Close()
-
-			kubectl.Wait()
-
-			return nil
+			return runKubectlWithResources(ctx, &args, &resources)
 		},
 	}
+}
+
+func replaceCommand() cli.Command {
+	return cli.Command{
+		Name:  "replace",
+		Usage: "Interpolate templates and run 'kubectl replace'",
+		Flags: commonFlags(),
+		Action: func(c *cli.Context) error {
+			limit := c.StringSlice("limit")
+			ctx, err := loadContext(c)
+			resources, err := templater.LoadAndPrepareTemplates(&limit, ctx)
+
+			if err != nil {
+				return err
+			}
+
+			args := []string{"replace", "--save-config=true", "-f", "-"}
+			return runKubectlWithResources(ctx, &args, &resources)
+		},
+	}
+}
+
+func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resources *[]string) error {
+	args := append(*kubectlArgs, fmt.Sprintf("--context=%s", c.Name))
+
+	kubectl := exec.Command("kubectl", args...)
+
+	stdin, err := kubectl.StdinPipe()
+	if err != nil {
+		return meep.New(&KubeCtlError{}, meep.Cause(err))
+	}
+
+	kubectl.Stdout = os.Stdout
+	kubectl.Stderr = os.Stderr
+
+	if err = kubectl.Start(); err != nil {
+		return meep.New(&KubeCtlError{}, meep.Cause(err))
+	}
+
+	for _, r := range *resources {
+		fmt.Fprintln(stdin, r)
+	}
+	stdin.Close()
+
+	kubectl.Wait()
+
+	return nil
 }
 
 func commonFlags() []cli.Flag {
@@ -114,8 +146,7 @@ func commonFlags() []cli.Flag {
 	}
 }
 
-func templateResources(c *cli.Context) ([]string, error) {
-	limit := c.StringSlice("limit")
+func loadContext(c *cli.Context) (*context.Context, error) {
 	f := c.String("file")
 
 	if f == "" {
@@ -133,5 +164,5 @@ func templateResources(c *cli.Context) ([]string, error) {
 		return nil, err
 	}
 
-	return templater.LoadAndPrepareTemplates(&limit, ctx)
+	return ctx, nil
 }
