@@ -14,6 +14,10 @@ import (
 type ResourceSet struct {
 	Name   string                 `json:"name"`
 	Values map[string]interface{} `json:"values"`
+
+	// Fields for resource set collections
+	Include []ResourceSet `json:"include"`
+	Parent  *string
 }
 
 type Context struct {
@@ -62,4 +66,24 @@ func LoadContextFromFile(filename string) (*Context, error) {
 	c.BaseDir = path.Dir(filename)
 
 	return &c, nil
+}
+
+// Flattens resource set collections, i.e. resource sets that themselves have an additional 'include' field set.
+// Those will be regarded as a short-hand for including multiple resource sets from a subfolder.
+// See https://github.com/tazjin/kontemplate/issues/9 for more information.
+func flattenResourceSetCollections(rs *[]ResourceSet) *[]ResourceSet {
+	flattened := make([]ResourceSet, 0)
+
+	for _, r := range *rs {
+		if len(r.Include) == 0 {
+			flattened = append(flattened, r)
+		} else {
+			for _, subResourceSet := range r.Include {
+				subResourceSet.Parent = &r.Name
+				flattened = append(flattened, subResourceSet)
+			}
+		}
+	}
+
+	return &flattened
 }

@@ -121,7 +121,7 @@ func applyLimits(rs *[]context.ResourceSet, include *[]string, exclude *[]string
 	// Exclude excluded resource sets
 	excluded := make([]context.ResourceSet, 0)
 	for _, r := range *rs {
-		if !contains(exclude, &r.Name) {
+		if !matchesResourceSet(exclude, &r) {
 			excluded = append(excluded, r)
 		}
 	}
@@ -132,7 +132,7 @@ func applyLimits(rs *[]context.ResourceSet, include *[]string, exclude *[]string
 	}
 	included := make([]context.ResourceSet, 0)
 	for _, r := range excluded {
-		if contains(include, &r.Name) {
+		if matchesResourceSet(include, &r) {
 			included = append(included, r)
 		}
 	}
@@ -140,10 +140,10 @@ func applyLimits(rs *[]context.ResourceSet, include *[]string, exclude *[]string
 	return &included
 }
 
-// Check whether a certain string is contained in a string slice
-func contains(s *[]string, v *string) bool {
+// Check whether an include/exclude string slice matches a resource set
+func matchesResourceSet(s *[]string, rs *context.ResourceSet) bool {
 	for _, r := range *s {
-		if r == *v {
+		if r == rs.Name || r == *rs.Parent {
 			return true
 		}
 	}
