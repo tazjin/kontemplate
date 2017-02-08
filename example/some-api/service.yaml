@@ -1,0 +1,5 @@
+---
+name: foo
+importantFeature: {{ .importantFeature }}
+port: {{ .apiPort }}
+globalTest: {{ .globalTest }}

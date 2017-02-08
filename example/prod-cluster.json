@@ -1,0 +1,16 @@
+{
+  "context": "k8s.prod.mydomain.com",
+  "global": {
+    "globalTest": "lizards"
+  },
+  "include": [
+    {
+      "name": "some-api",
+      "values": {
+        "version": "1.0-SNAPSHOT-0e6884d",
+        "importantFeature": true,
+        "apiPort": 4567
+      }
+    }
+  ]
+}
