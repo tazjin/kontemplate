@@ -143,7 +143,7 @@ func applyLimits(rs *[]context.ResourceSet, include *[]string, exclude *[]string
 // Check whether an include/exclude string slice matches a resource set
 func matchesResourceSet(s *[]string, rs *context.ResourceSet) bool {
 	for _, r := range *s {
-		if r == rs.Name || (rs.Parent != nil && r == *rs.Parent) {
+		if r == rs.Name || r == rs.Parent {
 			return true
 		}
 	}

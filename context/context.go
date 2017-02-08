@@ -17,7 +17,7 @@ type ResourceSet struct {
 
 	// Fields for resource set collections
 	Include []ResourceSet `json:"include"`
-	Parent  *string
+	Parent  string
 }
 
 type Context struct {
@@ -63,6 +63,7 @@ func LoadContextFromFile(filename string) (*Context, error) {
 		)
 	}
 
+	c.ResourceSets = *flattenResourceSetCollections(&c.ResourceSets)
 	c.BaseDir = path.Dir(filename)
 
 	return &c, nil
@@ -79,7 +80,7 @@ func flattenResourceSetCollections(rs *[]ResourceSet) *[]ResourceSet {
 			flattened = append(flattened, r)
 		} else {
 			for _, subResourceSet := range r.Include {
-				subResourceSet.Parent = &r.Name
+				subResourceSet.Parent = r.Name
 				subResourceSet.Name = path.Join(r.Name, subResourceSet.Name)
 				flattened = append(flattened, subResourceSet)
 			}
