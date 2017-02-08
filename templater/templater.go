@@ -2,6 +2,7 @@ package templater
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig"
 	"github.com/polydawn/meep"
 	"github.com/tazjin/kontemplate/context"
 )
@@ -88,7 +90,7 @@ func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files 
 }
 
 func templateFile(c *context.Context, rs *context.ResourceSet, filename string) (string, error) {
-	tpl, err := template.ParseFiles(filename)
+	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs()).ParseFiles(filename)
 
 	if err != nil {
 		return "", meep.New(
@@ -121,6 +123,16 @@ func templateFile(c *context.Context, rs *context.ResourceSet, filename string) 
 	}
 
 	return b.String(), nil
+}
+
+func templateFuncs() template.FuncMap {
+	m := sprig.TxtFuncMap()
+	m["json"] = func(data interface{}) string {
+		b, _ := json.Marshal(data)
+		return string(b)
+	}
+
+	return m
 }
 
 // Checks whether a file is a resource file (i.e. is YAML or JSON)
