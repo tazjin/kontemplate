@@ -1,0 +1,15 @@
+---
+context: k8s.prod.mydomain.com
+global:
+  globalVar: lizards
+include:
+  - name: some-api
+    values:
+      version: 1.0-0e6884d
+      importantFeature: true
+      apiPort: 4567
+  - name: collection
+    include:
+      - name: nested
+        values:
+          lizards: good
