@@ -40,9 +40,13 @@ func templateCommand() cli.Command {
 		Action: func(c *cli.Context) error {
 			include := c.StringSlice("include")
 			exclude := c.StringSlice("exclude")
-			ctx, err := loadContext(c)
-			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
 
+			ctx, err := loadContext(c)
+			if err != nil {
+				return err
+			}
+
+			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
 			if err != nil {
 				return err
 			}
