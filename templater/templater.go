@@ -158,6 +158,7 @@ func templateFuncs() template.FuncMap {
 		b, _ := json.Marshal(data)
 		return string(b)
 	}
+	m["passLookup"] = GetFromPass
 
 	return m
 }
