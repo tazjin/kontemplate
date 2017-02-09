@@ -23,7 +23,8 @@ type TemplateNotFoundError struct {
 
 // Error that is caused during templating, e.g. required value being absent or invalid template format
 type TemplatingError struct {
-	meep.AllTraits
+	meep.TraitAutodescribing
+	meep.TraitCausable
 }
 
 func LoadAndPrepareTemplates(include *[]string, exclude *[]string, c *context.Context) (output []string, err error) {
