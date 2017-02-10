@@ -13,6 +13,7 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/polydawn/meep"
 	"github.com/tazjin/kontemplate/context"
+	"github.com/tazjin/kontemplate/util"
 )
 
 // Error that is caused by non-existent template files being specified
@@ -88,17 +89,7 @@ func templateFile(c *context.Context, rs *context.ResourceSet, filename string) 
 
 	var b bytes.Buffer
 
-	// Guard against empty map before merging keys
-	if rs.Values == nil {
-		rs.Values = make(map[string]interface{}, 0)
-	}
-
-	// Merge global and resourceset-specific values (don't override from global)
-	for k, v := range c.Global {
-		if _, ok := rs.Values[k]; !ok {
-			rs.Values[k] = v
-		}
-	}
+	rs.Values = *util.Merge(&c.Global, &rs.Values)
 
 	err = tpl.Execute(&b, rs.Values)
 
