@@ -81,3 +81,62 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 	}
 
 }
+
+func TestSubresourceVariableInheritance(t *testing.T) {
+	ctx, err := LoadContextFromFile("testdata/parent-variables.yaml")
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	expected := Context{
+		Name: "k8s.prod.mydomain.com",
+		ResourceSets: []ResourceSet{
+			{
+				Name: "parent/child",
+				Values: map[string]interface{}{
+					"foo": "bar",
+					"bar": "baz",
+				},
+				Include: nil,
+				Parent: "parent",
+			},
+		},
+		BaseDir: "testdata",
+	}
+
+	if !reflect.DeepEqual(*ctx, expected) {
+		t.Error("Loaded and expected context did not match")
+		t.Fail()
+	}
+}
+
+func TestSubresourceVariableInheritanceOverride(t *testing.T) {
+	ctx, err := LoadContextFromFile("testdata/parent-variable-override.yaml")
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	expected := Context{
+		Name: "k8s.prod.mydomain.com",
+		ResourceSets: []ResourceSet{
+			{
+				Name: "parent/child",
+				Values: map[string]interface{}{
+					"foo": "newvalue",
+				},
+				Include: nil,
+				Parent: "parent",
+			},
+		},
+		BaseDir: "testdata",
+	}
+
+	if !reflect.DeepEqual(*ctx, expected) {
+		t.Error("Loaded and expected context did not match")
+		t.Fail()
+	}
+}
