@@ -9,6 +9,7 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/polydawn/meep"
+	"github.com/tazjin/kontemplate/util"
 )
 
 type ResourceSet struct {
@@ -82,6 +83,7 @@ func flattenResourceSetCollections(rs *[]ResourceSet) *[]ResourceSet {
 			for _, subResourceSet := range r.Include {
 				subResourceSet.Parent = r.Name
 				subResourceSet.Name = path.Join(r.Name, subResourceSet.Name)
+				subResourceSet.Values = *util.Merge(&r.Values, &subResourceSet.Values)
 				flattened = append(flattened, subResourceSet)
 			}
 		}
