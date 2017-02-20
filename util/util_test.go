@@ -1,8 +1,8 @@
 package util
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestMergeWithEmptyMap(t *testing.T) {

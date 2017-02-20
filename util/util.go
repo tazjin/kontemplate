@@ -11,7 +11,6 @@ func Merge(in1 *map[string]interface{}, in2 *map[string]interface{}) *map[string
 		return in1
 	}
 
-
 	new := make(map[string]interface{})
 	for k, v := range *in1 {
 		new[k] = v
