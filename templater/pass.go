@@ -8,6 +8,7 @@ import (
 	"os/exec"
 
 	"github.com/polydawn/meep"
+	"strings"
 )
 
 type PassError struct {
@@ -28,5 +29,7 @@ func GetFromPass(key string) (string, error) {
 		)
 	}
 
-	return string(output), nil
+	trimmed := strings.TrimSpace(string(output))
+
+	return trimmed, nil
 }
