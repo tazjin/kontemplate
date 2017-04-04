@@ -140,3 +140,17 @@ func TestSubresourceVariableInheritanceOverride(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestDefaultValuesLoading(t *testing.T) {
+	ctx, err := LoadContextFromFile("testdata/default-loading.yaml")
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	rs := ctx.ResourceSets[0]
+	if rs.Values["defaultValues"] != "loaded" {
+		t.Errorf("Default values not loaded from YAML file")
+		t.Fail()
+	}
+}
