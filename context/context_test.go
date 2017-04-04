@@ -153,4 +153,9 @@ func TestDefaultValuesLoading(t *testing.T) {
 		t.Errorf("Default values not loaded from YAML file")
 		t.Fail()
 	}
+
+	if rs.Values["override"] != "notAtAll" {
+		t.Error("Default values should not override other values")
+		t.Fail()
+	}
 }
