@@ -156,8 +156,12 @@ func templateFuncs() template.FuncMap {
 	return m
 }
 
-// Checks whether a file is a resource file (i.e. is YAML or JSON)
+// Checks whether a file is a resource file (i.e. is YAML or JSON) and not a default values file.
 func isResourceFile(f os.FileInfo) bool {
+	if f.Name() == "default.json" || f.Name() == "default.yaml" {
+		return false
+	}
+
 	return strings.HasSuffix(f.Name(), "yaml") ||
 		strings.HasSuffix(f.Name(), "yml") ||
 		strings.HasSuffix(f.Name(), "json")
