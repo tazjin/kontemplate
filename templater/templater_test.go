@@ -3,6 +3,7 @@ package templater
 import (
 	"github.com/tazjin/kontemplate/context"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -134,5 +135,21 @@ func TestApplyLimitsExcludeIncludePrecedence(t *testing.T) {
 		t.Error("Result does not contain expected resource sets.")
 		t.Errorf("Expected: %v\nResult: %v\n", expected, *result)
 		t.Fail()
+	}
+}
+
+func TestFailOnMissingKeys(t *testing.T) {
+	ctx := context.Context{}
+	resourceSet := context.ResourceSet{}
+
+	_, err := templateFile(&ctx, &resourceSet, "testdata/test-template.txt")
+
+	if err == nil {
+		t.Errorf("Template with missing keys should have failed.\n")
+		t.Fail()
+	}
+
+	if !strings.Contains(err.Error(), "map has no entry for key \"testName\"") {
+		t.Errorf("Templating failed with unexpected error: %v\n", err)
 	}
 }

@@ -16,6 +16,8 @@ import (
 	"github.com/tazjin/kontemplate/util"
 )
 
+const failOnMissingKeys string = "missingkey=error"
+
 // Error that is caused by non-existent template files being specified
 type TemplateNotFoundError struct {
 	meep.AllTraits
@@ -78,7 +80,7 @@ func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files 
 }
 
 func templateFile(c *context.Context, rs *context.ResourceSet, filename string) (string, error) {
-	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs()).ParseFiles(filename)
+	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs()).Option(failOnMissingKeys).ParseFiles(filename)
 
 	if err != nil {
 		return "", meep.New(
