@@ -8,141 +8,111 @@ import (
 	"github.com/polydawn/meep"
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/templater"
-	"github.com/urfave/cli"
+	"gopkg.in/alecthomas/kingpin.v2"
 )
 
 type KubeCtlError struct {
 	meep.AllTraits
 }
 
+var (
+	app = kingpin.New("kontemplate", "simple Kubernetes resource templating")
+
+	// Global flags
+	includes = app.Flag("include", "Resource sets to include explicitly").Short('i').Strings()
+	excludes = app.Flag("exclude", "Resource sets to exclude explicitly").Short('e').Strings()
+
+	// Commands
+	template     = app.Command("template", "Template resource sets and print them")
+	templateFile = template.Arg("file", "Cluster configuration file to use").Required().String()
+
+	apply       = app.Command("apply", "Template resources and pass to 'kubectl apply'")
+	applyFile   = apply.Arg("file", "Cluster configuration file to use").Required().String()
+	applyDryRun = apply.Flag("dry-run", "Print remote operations without executing them").Default("false").Bool()
+
+	replace     = app.Command("replace", "Template resources and pass to 'kubectl replace'")
+	replaceFile = replace.Arg("file", "Cluster configuration file to use").Required().String()
+
+	delete     = app.Command("delete", "Template resources and pass to 'kubectl delete'")
+	deleteFile = delete.Arg("file", "Cluster configuration file to use").Required().String()
+
+	create     = app.Command("create", "Template resources and pass to 'kubectl create'")
+	createFile = create.Arg("file", "Cluster configuration file to use").Required().String()
+)
+
 func main() {
-	app := cli.NewApp()
+	app.HelpFlag.Short('h')
 
-	app.Name = "kontemplate"
-	app.Usage = "simple Kubernetes resource templating"
-	app.Version = "v1.0.0-beta1"
+	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
+	case template.FullCommand():
+		templateCommand()
 
-	app.Commands = []cli.Command{
-		templateCommand(),
-		applyCommand(),
-		replaceCommand(),
-		deleteCommand(),
-	}
+	case apply.FullCommand():
+		applyCommand()
 
-	app.Run(os.Args)
-}
+	case replace.FullCommand():
+		replaceCommand()
 
-func templateCommand() cli.Command {
-	return cli.Command{
-		Name:  "template",
-		Usage: "Interpolate and print templates",
-		Flags: commonFlags(),
-		Action: func(c *cli.Context) error {
-			include := c.StringSlice("include")
-			exclude := c.StringSlice("exclude")
+	case delete.FullCommand():
+		deleteCommand()
 
-			ctx, err := loadContext(c)
-			if err != nil {
-				return err
-			}
-
-			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
-			if err != nil {
-				return err
-			}
-
-			for _, r := range resources {
-				fmt.Println(r)
-			}
-
-			return nil
-		},
+	case create.FullCommand():
+		createCommand()
 	}
 }
 
-func applyCommand() cli.Command {
-	dryRun := false
+func templateCommand() {
+	_, resources := loadContextAndResources(templateFile)
 
-	return cli.Command{
-		Name:  "apply",
-		Usage: "Interpolate templates and run 'kubectl apply'",
-		Flags: append(commonFlags(), cli.BoolFlag{
-			Name:        "dry-run",
-			Usage:       "Only print objects that would be sent, without sending them",
-			Destination: &dryRun,
-		}),
-		Action: func(c *cli.Context) error {
-			include := c.StringSlice("include")
-			exclude := c.StringSlice("exclude")
-			ctx, err := loadContext(c)
-			if err != nil {
-				return err
-			}
-
-			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
-			if err != nil {
-				return err
-			}
-
-			var args []string
-			if dryRun {
-				args = []string{"apply", "-f", "-", "--dry-run"}
-			} else {
-				args = []string{"apply", "-f", "-"}
-			}
-
-			return runKubectlWithResources(ctx, &args, &resources)
-		},
+	for _, r := range *resources {
+		fmt.Println(r)
 	}
 }
 
-func replaceCommand() cli.Command {
-	return cli.Command{
-		Name:  "replace",
-		Usage: "Interpolate templates and run 'kubectl replace'",
-		Flags: commonFlags(),
-		Action: func(c *cli.Context) error {
-			include := c.StringSlice("include")
-			exclude := c.StringSlice("exclude")
-			ctx, err := loadContext(c)
-			if err != nil {
-				return err
-			}
+func applyCommand() {
+	ctx, resources := loadContextAndResources(applyFile)
 
-			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
-			if err != nil {
-				return err
-			}
+	var kubectlArgs []string
 
-			args := []string{"replace", "--save-config=true", "-f", "-"}
-			return runKubectlWithResources(ctx, &args, &resources)
-		},
+	if *applyDryRun {
+		kubectlArgs = []string{"apply", "-f", "-", "--dry-run"}
+	} else {
+		kubectlArgs = []string{"apply", "-f", "-"}
 	}
+
+	runKubectlWithResources(ctx, &kubectlArgs, resources)
 }
 
-func deleteCommand() cli.Command {
-	return cli.Command{
-		Name:  "delete",
-		Usage: "Interpolate templates and run 'kubectl delete'",
-		Flags: commonFlags(),
-		Action: func(c *cli.Context) error {
-			include := c.StringSlice("include")
-			exclude := c.StringSlice("exclude")
+func replaceCommand() {
+	ctx, resources := loadContextAndResources(replaceFile)
+	args := []string{"replace", "--save-config=true", "-f", "-"}
+	runKubectlWithResources(ctx, &args, resources)
+}
 
-			ctx, err := loadContext(c)
-			if err != nil {
-				return err
-			}
+func deleteCommand() {
+	ctx, resources := loadContextAndResources(deleteFile)
+	args := []string{"delete", "-f", "-"}
+	runKubectlWithResources(ctx, &args, resources)
+}
 
-			resources, err := templater.LoadAndPrepareTemplates(&include, &exclude, ctx)
-			if err != nil {
-				return err
-			}
+func createCommand() {
+	ctx, resources := loadContextAndResources(createFile)
+	args := []string{"create", "--save-config=true", "-f", "-"}
+	runKubectlWithResources(ctx, &args, resources)
+}
 
-			args := []string{"delete", "-f", "-"}
-			return runKubectlWithResources(ctx, &args, &resources)
-		},
+func loadContextAndResources(file *string) (*context.Context, *[]string) {
+	ctx, err := context.LoadContextFromFile(*file)
+	if err != nil {
+		app.Fatalf("Error loading context: %v\n", err)
 	}
+
+	resources, err := templater.LoadAndPrepareTemplates(includes, excludes, ctx)
+	if err != nil {
+		app.Fatalf("Error templating resource sets: %v\n", err)
+	}
+
+	return ctx, &resources
 }
 
 func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resources *[]string) error {
@@ -170,42 +140,4 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 	kubectl.Wait()
 
 	return nil
-}
-
-func commonFlags() []cli.Flag {
-	return []cli.Flag{
-		cli.StringFlag{
-			Name:  "file, f",
-			Usage: "Cluster configuration file to use",
-		},
-		cli.StringSliceFlag{
-			Name:  "include, i",
-			Usage: "Limit templating to explicitly included resource sets",
-		},
-		cli.StringSliceFlag{
-			Name:  "exclude, e",
-			Usage: "Exclude certain resource sets from templating",
-		},
-	}
-}
-
-func loadContext(c *cli.Context) (*context.Context, error) {
-	f := c.String("file")
-
-	if f == "" {
-		return nil, meep.New(
-			&meep.ErrInvalidParam{
-				Param:  "file",
-				Reason: "Cluster config file must be specified (-f)",
-			},
-		)
-	}
-
-	ctx, err := context.LoadContextFromFile(f)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return ctx, nil
 }
