@@ -1,4 +1,4 @@
-KonTemplate - A simple Kubernetes templater
+Kontemplate - A simple Kubernetes templater
 ===========================================
 
 [![Build Status](https://travis-ci.org/tazjin/kontemplate.svg?branch=master)](https://travis-ci.org/tazjin/kontemplate)
@@ -9,7 +9,7 @@ which context (i.e. k8s cluster) is specified.
 
 ## Overview
 
-KonTemplate lets you describe resources as you normally would in a simple folder structure:
+Kontemplate lets you describe resources as you normally would in a simple folder structure:
 
 ```
 .
@@ -45,48 +45,48 @@ Assuming you have Go configured correctly, you can simply `go get github.com/taz
 
 ## Usage
 
-You must have `kubectl` installed to use KonTemplate effectively.
+You must have `kubectl` installed to use Kontemplate effectively.
 
 ```
-NAME:
-   kontemplate - simple Kubernetes resource templating
+usage: kontemplate [<flags>] <command> [<args> ...]
 
-USAGE:
-   kontemplate [global options] command [command options] [arguments...]
+simple Kubernetes resource templating
 
-VERSION:
-   0.0.1
+Flags:
+  -h, --help                 Show context-sensitive help (also try --help-long and --help-man).
+  -i, --include=INCLUDE ...  Resource sets to include explicitly
+  -e, --exclude=EXCLUDE ...  Resource sets to exclude explicitly
 
-COMMANDS:
-     template  Interpolate and print templates
-     apply     Interpolate templates and run 'kubectl apply'
-     replace   Interpolate templates and run 'kubectl replace'
-     delete    Interpolate templates and run 'kubectl delete'
-     help, h   Shows a list of commands or help for one command
+Commands:
+  help [<command>...]
+    Show help.
 
-GLOBAL OPTIONS:
-   --help, -h     show help
-   --version, -v  print the version
-```
+  template <file>
+    Template resource sets and print them
 
-All options support the same set of extra flags:
+  apply [<flags>] <file>
+    Template resources and pass to 'kubectl apply'
 
-```
-OPTIONS:
-   --file value, -f value     Cluster configuration file to use
-   --include value, -i value  Limit templating to explicitly included resource sets
-   --exclude value, -e value  Exclude certain resource sets from templating
+  replace <file>
+    Template resources and pass to 'kubectl replace'
+
+  delete <file>
+    Template resources and pass to 'kubectl delete'
+
+  create <file>
+    Template resources and pass to 'kubectl create'
+
 ```
 
 Examples:
 
 ```
 # Look at output for a specific resource set and check to see if it's correct ...
-kontemplate template -f example/prod-cluster.yaml -i some-api
+kontemplate template example/prod-cluster.yaml -i some-api
 
 # ... maybe do a dry-run to see what kubectl would do:
-kontemplate apply -f example/prod-cluster.yaml --dry-run
+kontemplate apply example/prod-cluster.yaml --dry-run
 
 # And actually apply it if you like what you see:
-kontemplate apply -f example/prod-cluster.yaml
+kontemplate apply example/prod-cluster.yaml
 ```
