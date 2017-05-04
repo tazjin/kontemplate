@@ -33,6 +33,11 @@ type TemplatingError struct {
 func LoadAndPrepareTemplates(include *[]string, exclude *[]string, c *context.Context) (output []string, err error) {
 	limitedResourceSets := applyLimits(&c.ResourceSets, include, exclude)
 
+	if len(*limitedResourceSets) == 0 {
+		fmt.Fprintln(os.Stderr, "No valid resource sets included!")
+		return
+	}
+
 	for _, rs := range *limitedResourceSets {
 		err = processResourceSet(c, &rs, &output)
 
