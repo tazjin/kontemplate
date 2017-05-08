@@ -11,6 +11,10 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+const version string = "1.0"
+// This variable will be initialised by the Go linker during the builder
+var gitHash string
+
 type KubeCtlError struct {
 	meep.AllTraits
 }
@@ -38,6 +42,8 @@ var (
 
 	create     = app.Command("create", "Template resources and pass to 'kubectl create'")
 	createFile = create.Arg("file", "Cluster configuration file to use").Required().String()
+
+	versionCmd = app.Command("version", "Show kontemplate version")
 )
 
 func main() {
@@ -58,6 +64,17 @@ func main() {
 
 	case create.FullCommand():
 		createCommand()
+
+	case versionCmd.FullCommand():
+		versionCommand()
+	}
+}
+
+func versionCommand() {
+	if gitHash == "" {
+		fmt.Printf("Kontemplate version %s (git commit unknown)\n", version)
+	} else {
+		fmt.Printf("Kontemplate version %s (git commit: %s)\n", version, gitHash)
 	}
 }
 
