@@ -98,25 +98,36 @@ func applyCommand() {
 		kubectlArgs = []string{"apply", "-f", "-"}
 	}
 
-	runKubectlWithResources(ctx, &kubectlArgs, resources)
+	if err := runKubectlWithResources(ctx, &kubectlArgs, resources); err != nil {
+		failWithKubectlError(err)
+	}
 }
 
 func replaceCommand() {
 	ctx, resources := loadContextAndResources(replaceFile)
 	args := []string{"replace", "--save-config=true", "-f", "-"}
-	runKubectlWithResources(ctx, &args, resources)
+
+	if err := runKubectlWithResources(ctx, &args, resources); err != nil {
+		failWithKubectlError(err)
+	}
 }
 
 func deleteCommand() {
 	ctx, resources := loadContextAndResources(deleteFile)
 	args := []string{"delete", "-f", "-"}
-	runKubectlWithResources(ctx, &args, resources)
+
+	if err := runKubectlWithResources(ctx, &args, resources); err != nil {
+		failWithKubectlError(err)
+	}
 }
 
 func createCommand() {
 	ctx, resources := loadContextAndResources(createFile)
 	args := []string{"create", "--save-config=true", "-f", "-"}
-	runKubectlWithResources(ctx, &args, resources)
+
+	if err := runKubectlWithResources(ctx, &args, resources); err != nil {
+		failWithKubectlError(err)
+	}
 }
 
 func loadContextAndResources(file *string) (*context.Context, *[]string) {
@@ -156,4 +167,9 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 	stdin.Close()
 
 	return kubectl.Wait()
+}
+
+func failWithKubectlError(err error) {
+	fmt.Errorf("Kubectl error: %v\n", err)
+	os.Exit(1)
 }
