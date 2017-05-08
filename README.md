@@ -74,6 +74,8 @@ to only update the `api` resource sets and the `frontend/user-page` resource set
 
 Assuming you have Go configured correctly, you can simply `go get github.com/tazjin/kontemplate/...`.
 
+There are signed binary releases available on the [releases page][] for Linux, OS X and Windows.
+
 ## Usage
 
 You must have `kubectl` installed to use Kontemplate effectively.
@@ -123,3 +125,4 @@ kontemplate apply example/prod-cluster.yaml
 ```
 
 [Helm]: https://helm.sh/
+[releases page]: https://github.com/tazjin/kontemplate/releases
