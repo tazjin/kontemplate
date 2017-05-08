@@ -11,7 +11,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
-const version string = "1.0"
+const version string = "1.0.1"
 
 // This variable will be initialised by the Go linker during the builder
 var gitHash string
@@ -155,7 +155,5 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 	}
 	stdin.Close()
 
-	kubectl.Wait()
-
-	return nil
+	return kubectl.Wait()
 }
