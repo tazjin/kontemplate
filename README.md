@@ -3,9 +3,15 @@ Kontemplate - A simple Kubernetes templater
 
 [![Build Status](https://travis-ci.org/tazjin/kontemplate.svg?branch=master)](https://travis-ci.org/tazjin/kontemplate)
 
-I made this tool out of frustration with the available ways to template Kubernetes resource files. All I want out of
-such a tool is a way to specify lots of resources with placeholders that get filled in with specific values, based on
-which context (i.e. k8s cluster) is specified.
+Kontemplate is a simple CLI tool that can take sets of Kubernetes resource
+files with placeholders and insert values per environment.
+
+This tool was made because in many cases all I want in terms of Kubernetes
+configuration is simple value interpolation per environment (i.e. Kubernetes
+cluster), but with the same deployment files.
+
+In my experience this is often enough and more complex solutions such as
+[Helm][] are not required.
 
 ## Overview
 
@@ -37,7 +43,32 @@ include:
       apiPort: 4567
 ```
 
-Those values are then templated into the resource files of `some-api`.
+Those values are then templated into the resource files of `some-api`. That's it!
+
+You can also set up more complicated folder structures for organisation, for example:
+
+```
+.
+├── api
+│   ├── image-api
+│   │   └── deployment.yaml
+│   └── music-api
+│       └── deployment.yaml
+│   │   └── default.json
+├── frontend
+│   ├── main-app
+│   │   ├── deployment.yaml
+│   │   └── service.yaml
+│   └── user-page
+│       ├── deployment.yaml
+│       └── service.yaml
+├── prod-cluster.yaml
+└── test-cluster.yaml
+```
+
+And selectively template or apply resources with a command such as
+`kontemplate apply test-cluster.yaml --include api --include frontend/user-page`
+to only update the `api` resource sets and the `frontend/user-page` resource set.
 
 ## Installation
 
@@ -90,3 +121,5 @@ kontemplate apply example/prod-cluster.yaml --dry-run
 # And actually apply it if you like what you see:
 kontemplate apply example/prod-cluster.yaml
 ```
+
+[Helm]: https://helm.sh/
