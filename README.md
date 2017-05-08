@@ -74,7 +74,8 @@ to only update the `api` resource sets and the `frontend/user-page` resource set
 
 Assuming you have Go configured correctly, you can simply `go get github.com/tazjin/kontemplate/...`.
 
-There are signed binary releases available on the [releases page][] for Linux, OS X and Windows.
+There are signed binary releases available on the [releases page][] for Linux, OS X,
+FreeBSD and Windows.
 
 ## Usage
 
