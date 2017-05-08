@@ -77,6 +77,8 @@ Assuming you have Go configured correctly, you can simply `go get github.com/taz
 There are signed binary releases available on the [releases page][] for Linux, OS X,
 FreeBSD and Windows.
 
+An [AUR package][] is available for Arch Linux and other `pacman`-based distributions.
+
 ## Usage
 
 You must have `kubectl` installed to use Kontemplate effectively.
@@ -127,3 +129,4 @@ kontemplate apply example/prod-cluster.yaml
 
 [Helm]: https://helm.sh/
 [releases page]: https://github.com/tazjin/kontemplate/releases
+[AUR package]: https://aur.archlinux.org/packages/kontemplate-git/
