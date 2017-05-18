@@ -73,7 +73,7 @@ action:
       echo 'nameserver 8.8.8.8' > /etc/resolv.conf
       apt-get update && apt-get install -y git ca-certificates
       mkdir -p /go/src/github.com/tazjin
-      git clone --single-branch --branch v1.0.1 https://github.com/tazjin/kontemplate /go/src/github.com/tazjin/kontemplate
+      git clone --single-branch --branch v1.0.2 https://github.com/tazjin/kontemplate /go/src/github.com/tazjin/kontemplate
       cd /go/src/github.com/tazjin/kontemplate
       ./build-release.sh build
 outputs:
