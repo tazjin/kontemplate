@@ -72,12 +72,32 @@ to only update the `api` resource sets and the `frontend/user-page` resource set
 
 ## Installation
 
-Assuming you have Go configured correctly, you can simply `go get github.com/tazjin/kontemplate/...`.
+It is recommended to install Kontemplate from the signed binary releases available on the
+[releases page][]. Release binaries are available for Linux, OS X, FreeBSD and Windows.
 
-There are signed binary releases available on the [releases page][] for Linux, OS X,
-FreeBSD and Windows.
+### Homebrew
+
+OS X users with Homebrew installed can "tap" Kontemplate like such:
+
+```sh
+brew tap tazjin/kontemplate https://github.com/tazjin/kontemplate
+brew install kontemplate
+```
+
+### Arch Linux
 
 An [AUR package][] is available for Arch Linux and other `pacman`-based distributions.
+
+### Building repeatably from source
+
+Version pinning for Go dependencies is provided by a [Repeatr][] formula. After cloning
+the repository the latest release can be built with `repeatr run kontemplate.frm`.
+
+This will place release binaries in the `release` folder.
+
+### Building from source
+
+Assuming you have Go configured correctly, you can simply `go get github.com/tazjin/kontemplate/...`.
 
 ## Usage
 
@@ -130,3 +150,4 @@ kontemplate apply example/prod-cluster.yaml
 [Helm]: https://helm.sh/
 [releases page]: https://github.com/tazjin/kontemplate/releases
 [AUR package]: https://aur.archlinux.org/packages/kontemplate-git/
+[Repeatr]: http://repeatr.io/
