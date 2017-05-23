@@ -95,6 +95,13 @@ func templateFile(c *context.Context, rs *context.ResourceSet, filename string) 
 	}
 
 	var b bytes.Buffer
+	// For YAML-formatted templates an additional resource separator ('---') will be inserted at the beginning
+	// of the YAML file.
+	// This prevents an error-case in which resources spread out over multiple files may not be recognised as such
+	// if the user forgets to insert a separator manually.
+	if strings.HasSuffix(filename, "yaml") || strings.HasSuffix(filename, "yml") {
+		b.WriteString("---\n")
+	}
 
 	rs.Values = *util.Merge(&c.Global, &rs.Values)
 
