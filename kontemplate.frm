@@ -10,11 +10,11 @@ inputs:
   # Kontemplate dependencies!
   "/go/src/github.com/polydawn/meep":
     type: "git"
-    hash: "1487840a4bf30270decdc04123c41cdc7a8067c9"
+    hash: "296620394aa9cbcce7cfe9ad903489b8057662bc"
     silo: "https://github.com/polydawn/meep"
   "/go/src/github.com/Masterminds/sprig":
     type: "git"
-    hash: "f5b0ed4a680a0943228155eaf6a77a96ead1bc77"
+    hash: "e039e20e500c2c025d9145be375e27cf42a94174"
     silo: "https://github.com/Masterminds/sprig"
   "/go/src/github.com/ghodss/yaml":
     type: "git"
@@ -42,7 +42,7 @@ inputs:
     silo: "https://github.com/Masterminds/semver"
   "/go/src/github.com/aokoli/goutils":
     type: "git"
-    hash: "e57d01ace047c1a43e6a49ecf3ecc50ed2be81d1"
+    hash: "3391d3790d23d03408670993e957e8f408993c34"
     silo: "https://github.com/aokoli/goutils"
   "/go/src/github.com/huandu/xstrings":
     type: "git"
