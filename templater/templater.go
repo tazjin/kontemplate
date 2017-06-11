@@ -42,7 +42,7 @@ type RenderedResourceSet struct {
 
 func LoadAndApplyTemplates(include *[]string, exclude *[]string, c *context.Context) ([]RenderedResourceSet, error) {
 	limitedResourceSets := applyLimits(&c.ResourceSets, include, exclude)
-	renderedResourceSets := make([]RenderedResourceSet, len(c.ResourceSets))
+	renderedResourceSets := make([]RenderedResourceSet, 0)
 
 	if len(*limitedResourceSets) == 0 {
 		return renderedResourceSets, fmt.Errorf("No valid resource sets included!")
@@ -83,7 +83,7 @@ func processResourceSet(c *context.Context, rs *context.ResourceSet) (*RenderedR
 }
 
 func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files []os.FileInfo) ([]RenderedResource, error) {
-	resources := make([]RenderedResource, len(c.ResourceSets))
+	resources := make([]RenderedResource, 0)
 
 	for _, file := range files {
 		if !file.IsDir() && isResourceFile(file) {
