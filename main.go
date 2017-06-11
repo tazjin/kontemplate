@@ -80,10 +80,13 @@ func versionCommand() {
 }
 
 func templateCommand() {
-	_, resources := loadContextAndResources(templateFile)
+	_, resourceSets := loadContextAndResources(templateFile)
 
-	for _, r := range *resources {
-		fmt.Println(r)
+	for _, rs := range *resourceSets {
+		for _, r := range rs.Resources {
+			fmt.Fprintf(os.Stderr, "Rendered file %s/%s:\n", rs.Name, r.Filename)
+			fmt.Println(r.Rendered)
+		}
 	}
 }
 
@@ -163,7 +166,7 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 		}
 
 		for _, r := range resourceSet.Resources {
-			fmt.Printf("Passing file %s/%s to kubectl", resourceSet.Name, r.Filename)
+			fmt.Printf("Passing file %s/%s to kubectl\n", resourceSet.Name, r.Filename)
 			fmt.Fprintln(stdin, r.Rendered)
 		}
 		stdin.Close()
