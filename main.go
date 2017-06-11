@@ -130,13 +130,13 @@ func createCommand() {
 	}
 }
 
-func loadContextAndResources(file *string) (*context.Context, *[]string) {
+func loadContextAndResources(file *string) (*context.Context, *[]templater.RenderedResourceSet) {
 	ctx, err := context.LoadContextFromFile(*file)
 	if err != nil {
 		app.Fatalf("Error loading context: %v\n", err)
 	}
 
-	resources, err := templater.LoadAndPrepareTemplates(includes, excludes, ctx)
+	resources, err := templater.LoadAndApplyTemplates(includes, excludes, ctx)
 	if err != nil {
 		app.Fatalf("Error templating resource sets: %v\n", err)
 	}
@@ -144,29 +144,36 @@ func loadContextAndResources(file *string) (*context.Context, *[]string) {
 	return ctx, &resources
 }
 
-func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resources *[]string) error {
+func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resourceSets *[]templater.RenderedResourceSet) error {
 	args := append(*kubectlArgs, fmt.Sprintf("--context=%s", c.Name))
 
-	kubectl := exec.Command("kubectl", args...)
+	for _, resourceSet := range *resourceSets {
+		kubectl := exec.Command("kubectl", args...)
 
-	stdin, err := kubectl.StdinPipe()
-	if err != nil {
-		return meep.New(&KubeCtlError{}, meep.Cause(err))
+		stdin, err := kubectl.StdinPipe()
+		if err != nil {
+			return meep.New(&KubeCtlError{}, meep.Cause(err))
+		}
+
+		kubectl.Stdout = os.Stdout
+		kubectl.Stderr = os.Stderr
+
+		if err = kubectl.Start(); err != nil {
+			return meep.New(&KubeCtlError{}, meep.Cause(err))
+		}
+
+		for _, r := range resourceSet.Resources {
+			fmt.Printf("Passing file %s/%s to kubectl", resourceSet.Name, r.Filename)
+			fmt.Fprintln(stdin, r.Rendered)
+		}
+		stdin.Close()
+
+		if err = kubectl.Wait(); err != nil {
+			return err
+		}
 	}
 
-	kubectl.Stdout = os.Stdout
-	kubectl.Stderr = os.Stderr
-
-	if err = kubectl.Start(); err != nil {
-		return meep.New(&KubeCtlError{}, meep.Cause(err))
-	}
-
-	for _, r := range *resources {
-		fmt.Fprintln(stdin, r)
-	}
-	stdin.Close()
-
-	return kubectl.Wait()
+	return nil
 }
 
 func failWithKubectlError(err error) {
