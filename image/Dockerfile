@@ -2,7 +2,7 @@ FROM alpine:3.6
 
 ADD hashes /root/hashes
 ADD https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubectl /usr/bin/kubectl
-ADD https://github.com/tazjin/kontemplate/releases/download/v1.0.2/kontemplate-1.0.2-f79b261-linux-amd64.tar.gz /tmp/kontemplate.tar.gz
+ADD https://github.com/tazjin/kontemplate/releases/download/v1.1.0/kontemplate-1.1.0-f7ce04e-linux-amd64.tar.gz /tmp/kontemplate.tar.gz
 
 # Pass release version is 1.7.1
 ADD https://raw.githubusercontent.com/zx2c4/password-store/38ec1c72e29c872ec0cdde82f75490640d4019bf/src/password-store.sh /usr/bin/pass
