@@ -30,58 +30,79 @@ type TemplatingError struct {
 	meep.TraitCausable
 }
 
-func LoadAndPrepareTemplates(include *[]string, exclude *[]string, c *context.Context) (output []string, err error) {
+type RenderedResource struct {
+	Filename string
+	Rendered string
+}
+
+type RenderedResourceSet struct {
+	Name      string
+	Resources []RenderedResource
+}
+
+func LoadAndApplyTemplates(include *[]string, exclude *[]string, c *context.Context) ([]RenderedResourceSet, error) {
 	limitedResourceSets := applyLimits(&c.ResourceSets, include, exclude)
+	renderedResourceSets := make([]RenderedResourceSet, len(c.ResourceSets))
 
 	if len(*limitedResourceSets) == 0 {
-		fmt.Fprintln(os.Stderr, "No valid resource sets included!")
-		return
+		return renderedResourceSets, fmt.Errorf("No valid resource sets included!")
 	}
 
 	for _, rs := range *limitedResourceSets {
-		err = processResourceSet(c, &rs, &output)
+		set, err := processResourceSet(c, &rs)
 
 		if err != nil {
-			return
+			return nil, err
 		}
+
+		renderedResourceSets = append(renderedResourceSets, *set)
 	}
 
-	return
+	return renderedResourceSets, nil
 }
 
-func processResourceSet(c *context.Context, rs *context.ResourceSet, output *[]string) error {
+func processResourceSet(c *context.Context, rs *context.ResourceSet) (*RenderedResourceSet, error) {
 	fmt.Fprintf(os.Stderr, "Loading resources for %s\n", rs.Name)
 
 	rp := path.Join(c.BaseDir, rs.Name)
 	files, err := ioutil.ReadDir(rp)
 
-	err = processFiles(c, rs, rp, files, output)
+	resources, err := processFiles(c, rs, rp, files)
 
 	if err != nil {
-		return meep.New(
+		return nil, meep.New(
 			&TemplateNotFoundError{Name: rs.Name},
 			meep.Cause(err),
 		)
 	}
 
-	return nil
+	return &RenderedResourceSet{
+		Name:      rs.Name,
+		Resources: resources,
+	}, nil
 }
 
-func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files []os.FileInfo, output *[]string) error {
+func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files []os.FileInfo) ([]RenderedResource, error) {
+	resources := make([]RenderedResource, len(c.ResourceSets))
+
 	for _, file := range files {
 		if !file.IsDir() && isResourceFile(file) {
 			p := path.Join(rp, file.Name())
 			o, err := templateFile(c, rs, p)
 
 			if err != nil {
-				return err
+				return resources, err
 			}
 
-			*output = append(*output, o)
+			res := RenderedResource{
+				Filename: file.Name(),
+				Rendered: o,
+			}
+			resources = append(resources, res)
 		}
 	}
 
-	return nil
+	return resources, nil
 }
 
 func templateFile(c *context.Context, rs *context.ResourceSet, filename string) (string, error) {
