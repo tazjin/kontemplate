@@ -106,7 +106,7 @@ func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files 
 }
 
 func templateFile(c *context.Context, rs *context.ResourceSet, filename string) (string, error) {
-	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs()).Option(failOnMissingKeys).ParseFiles(filename)
+	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs(c)).Option(failOnMissingKeys).ParseFiles(filename)
 
 	if err != nil {
 		return "", meep.New(
@@ -172,13 +172,16 @@ func matchesResourceSet(s *[]string, rs *context.ResourceSet) bool {
 	return false
 }
 
-func templateFuncs() template.FuncMap {
+func templateFuncs(c *context.Context) template.FuncMap {
 	m := sprig.TxtFuncMap()
 	m["json"] = func(data interface{}) string {
 		b, _ := json.Marshal(data)
 		return string(b)
 	}
 	m["passLookup"] = GetFromPass
+	m["getResource"] = func(kind, name string, namespace string) (string, error) {
+		return GetResource(c, kind, name, namespace)
+	}
 
 	return m
 }
