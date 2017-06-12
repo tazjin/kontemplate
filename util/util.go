@@ -1,5 +1,19 @@
 package util
 
+import "github.com/polydawn/meep"
+
+// Common error type for kubectl calls
+type KubeCtlError struct {
+	meep.TraitAutodescribing
+	meep.TraitCausable
+
+	// The argument list that kubectl was called with
+	Args []string
+
+	// Kubectl stderr (if present)
+	Stderr string
+}
+
 // Merges two maps together. Values from the second map override values in the first map.
 // The returned map is new if anything was changed.
 func Merge(in1 *map[string]interface{}, in2 *map[string]interface{}) *map[string]interface{} {

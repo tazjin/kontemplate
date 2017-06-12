@@ -8,6 +8,7 @@ import (
 	"github.com/polydawn/meep"
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/templater"
+	"github.com/tazjin/kontemplate/util"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -15,10 +16,6 @@ const version string = "1.1.0"
 
 // This variable will be initialised by the Go linker during the builder
 var gitHash string
-
-type KubeCtlError struct {
-	meep.AllTraits
-}
 
 var (
 	app = kingpin.New("kontemplate", "simple Kubernetes resource templating")
@@ -155,14 +152,14 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 
 		stdin, err := kubectl.StdinPipe()
 		if err != nil {
-			return meep.New(&KubeCtlError{}, meep.Cause(err))
+			return meep.New(&util.KubeCtlError{}, meep.Cause(err))
 		}
 
 		kubectl.Stdout = os.Stdout
 		kubectl.Stderr = os.Stderr
 
 		if err = kubectl.Start(); err != nil {
-			return meep.New(&KubeCtlError{}, meep.Cause(err))
+			return meep.New(&util.KubeCtlError{Args: args}, meep.Cause(err))
 		}
 
 		for _, r := range resourceSet.Resources {
