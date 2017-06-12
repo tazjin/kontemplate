@@ -11,21 +11,17 @@ import (
 	"github.com/tazjin/kontemplate/util"
 )
 
-func GetResource(c *context.Context, kind string, name string, namespace string) (string, error) {
-	if namespace == "" {
-		namespace = "default"
-	}
-
+func GetResource(c *context.Context, namespace, kind, name string) (string, error) {
 	fmt.Fprintf(os.Stderr, "Attempting to retrieve last applied configuration for %s %s in namespace %s",
 		kind, name, namespace)
 
-	return getLastAppliedConfiguration(c, kind, name, namespace)
+	return getLastAppliedConfiguration(c, namespace, name, kind)
 }
 
 // Retrieves the last applied configuration of a resource. Kontemplate always uses the correct flags to store the
 // necessary annotation, but this may not work with resources created using 'kubectl create' by other tools.
 // The call requires at least kubectl v1.6.0.
-func getLastAppliedConfiguration(c *context.Context, kind string, name string, namespace string) (string, error) {
+func getLastAppliedConfiguration(c *context.Context, namespace, kind, name string) (string, error) {
 	args := []string{
 		fmt.Sprintf("--context=%s", c.Name),
 		fmt.Sprintf("--namespace=%s", namespace),
@@ -54,5 +50,5 @@ func getLastAppliedConfiguration(c *context.Context, kind string, name string, n
 		}, meep.Cause(err))
 	}
 
-	return w.String(), nilsu
+	return w.String(), nil
 }
