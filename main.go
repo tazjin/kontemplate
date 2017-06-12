@@ -177,6 +177,6 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 }
 
 func failWithKubectlError(err error) {
-	fmt.Errorf("Kubectl error: %v\n", err)
+	fmt.Fprintf(os.Stderr, "Kubectl error: %v\n", err)
 	os.Exit(1)
 }
