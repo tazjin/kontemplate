@@ -147,6 +147,12 @@ kontemplate apply example/prod-cluster.yaml --dry-run
 kontemplate apply example/prod-cluster.yaml
 ```
 
+## Contributing
+
+Feel free to contribute pull requests, file bugs and open issues with feature suggestions!
+
+Please follow the [code of conduct](CODE_OF_CONDUCT.md).
+
 [Helm]: https://helm.sh/
 [releases page]: https://github.com/tazjin/kontemplate/releases
 [AUR package]: https://aur.archlinux.org/packages/kontemplate-git/
