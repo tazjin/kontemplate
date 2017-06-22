@@ -159,3 +159,47 @@ func TestDefaultValuesLoading(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestImportValuesLoading(t *testing.T) {
+	ctx, err := LoadContextFromFile("testdata/import-vars-simple.yaml")
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	expected := map[string]interface{}{
+		"override": "true",
+		"music": map[string]interface{}{
+			"artist": "Pallida",
+			"track":  "Tractor Beam",
+		},
+	}
+
+	if !reflect.DeepEqual(ctx.Global, expected) {
+		t.Error("Expected global values after loading imports did not match!")
+		t.Fail()
+	}
+}
+
+func TestImportValuesOverride(t *testing.T) {
+	ctx, err := LoadContextFromFile("testdata/import-vars-override.yaml")
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	expected := map[string]interface{}{
+		"override": float64(3),
+		"music": map[string]interface{}{
+			"artist": "Pallida",
+			"track":  "Tractor Beam",
+		},
+		"place":     "Oslo",
+		"globalVar": "very global!",
+	}
+
+	if !reflect.DeepEqual(ctx.Global, expected) {
+		t.Error("Expected global values after loading imports did not match!")
+		t.Fail()
+	}
+}

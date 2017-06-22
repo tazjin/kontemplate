@@ -1,0 +1,5 @@
+---
+context: k8s.prod.mydomain.com
+import:
+  - test-vars.yaml
+include: []

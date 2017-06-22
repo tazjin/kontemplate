@@ -17,10 +17,11 @@ type ResourceSet struct {
 }
 
 type Context struct {
-	Name         string                 `json:"context"`
-	Global       map[string]interface{} `json:"global"`
-	ResourceSets []ResourceSet          `json:"include"`
-	BaseDir      string
+	Name            string                 `json:"context"`
+	Global          map[string]interface{} `json:"global"`
+	ResourceSets    []ResourceSet          `json:"include"`
+	VariableImports []string               `json:"import"`
+	BaseDir         string
 }
 
 type ContextLoadingError struct {
@@ -44,7 +45,32 @@ func LoadContextFromFile(filename string) (*Context, error) {
 	c.BaseDir = path.Dir(filename)
 	c.ResourceSets = loadAllDefaultValues(&c)
 
+	err = c.loadImportedVariables()
+	if err != nil {
+		return nil, meep.New(
+			&ContextLoadingError{Filename: filename},
+			meep.Cause(err),
+		)
+	}
+
 	return &c, nil
+}
+
+// Kontemplate supports specifying additional variable files with the `import` keyword. This function loads those
+// variable files and merges them together with the context's other global variables.
+func (ctx *Context) loadImportedVariables() error {
+	for _, file := range ctx.VariableImports {
+		var importedVars map[string]interface{}
+		err := util.LoadJsonOrYaml(path.Join(ctx.BaseDir, file), &importedVars)
+
+		if err != nil {
+			return err
+		}
+
+		ctx.Global = *util.Merge(&ctx.Global, &importedVars)
+	}
+
+	return nil
 }
 
 // Flattens resource set collections, i.e. resource sets that themselves have an additional 'include' field set.
