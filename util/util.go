@@ -1,5 +1,14 @@
 package util
 
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"strings"
+
+	"github.com/ghodss/yaml"
+)
+
 // Merges two maps together. Values from the second map override values in the first map.
 // The returned map is new if anything was changed.
 func Merge(in1 *map[string]interface{}, in2 *map[string]interface{}) *map[string]interface{} {
@@ -21,4 +30,22 @@ func Merge(in1 *map[string]interface{}, in2 *map[string]interface{}) *map[string
 	}
 
 	return &new
+}
+
+// Loads either a YAML or JSON file from the specified path and deserialises it into the provided interface.
+func LoadJsonOrYaml(filename string, addr interface{}) error {
+	file, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+
+	if strings.HasSuffix(filename, "json") {
+		err = json.Unmarshal(file, addr)
+	} else if strings.HasSuffix(filename, "yaml") || strings.HasSuffix(filename, "yml") {
+		err = yaml.Unmarshal(file, addr)
+	} else {
+		return fmt.Errorf("File format not supported. Must be JSON or YAML.")
+	}
+
+	return nil
 }

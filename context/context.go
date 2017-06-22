@@ -1,13 +1,8 @@
 package context
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"path"
-	"strings"
 
-	"github.com/ghodss/yaml"
 	"github.com/polydawn/meep"
 	"github.com/tazjin/kontemplate/util"
 )
@@ -35,27 +30,8 @@ type ContextLoadingError struct {
 
 // Attempt to load and deserialise a Context from the specified file.
 func LoadContextFromFile(filename string) (*Context, error) {
-	file, err := ioutil.ReadFile(filename)
-
-	if err != nil {
-		return nil, meep.New(
-			&ContextLoadingError{Filename: filename},
-			meep.Cause(err),
-		)
-	}
-
 	var c Context
-
-	if strings.HasSuffix(filename, "json") {
-		err = json.Unmarshal(file, &c)
-	} else if strings.HasSuffix(filename, "yaml") || strings.HasSuffix(filename, "yml") {
-		err = yaml.Unmarshal(file, &c)
-	} else {
-		return nil, meep.New(
-			&ContextLoadingError{Filename: filename},
-			meep.Cause(fmt.Errorf("File format not supported. Must be JSON or YAML.")),
-		)
-	}
+	err := util.LoadJsonOrYaml(filename, &c)
 
 	if err != nil {
 		return nil, meep.New(
@@ -112,16 +88,14 @@ func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	var defaultVars map[string]interface{}
 
 	// Attempt to load YAML values
-	y, err := ioutil.ReadFile(path.Join(c.BaseDir, rs.Name, "default.yaml"))
+	err := util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Name, "default.yaml"), &defaultVars)
 	if err == nil {
-		yaml.Unmarshal(y, &defaultVars)
 		return util.Merge(&defaultVars, &rs.Values)
 	}
 
 	// Attempt to load JSON values
-	j, err := ioutil.ReadFile(path.Join(c.BaseDir, rs.Name, "default.json"))
+	err = util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Name, "default.json"), &defaultVars)
 	if err == nil {
-		json.Unmarshal(j, &defaultVars)
 		return util.Merge(&defaultVars, &rs.Values)
 	}
 
