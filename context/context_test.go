@@ -21,6 +21,7 @@ func TestLoadFlatContextFromFile(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "some-api",
+				Path: "some-api",
 				Values: map[string]interface{}{
 					"apiPort":          float64(4567), // yep!
 					"importantFeature": true,
@@ -55,6 +56,7 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "some-api",
+				Path: "some-api",
 				Values: map[string]interface{}{
 					"apiPort":          float64(4567), // yep!
 					"importantFeature": true,
@@ -65,6 +67,7 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 			},
 			{
 				Name: "collection/nested",
+				Path: "collection/nested",
 				Values: map[string]interface{}{
 					"lizards": "good",
 				},
@@ -95,6 +98,7 @@ func TestSubresourceVariableInheritance(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "parent/child",
+				Path: "parent/child",
 				Values: map[string]interface{}{
 					"foo": "bar",
 					"bar": "baz",
@@ -125,6 +129,7 @@ func TestSubresourceVariableInheritanceOverride(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "parent/child",
+				Path: "parent/child",
 				Values: map[string]interface{}{
 					"foo": "newvalue",
 				},
@@ -200,6 +205,69 @@ func TestImportValuesOverride(t *testing.T) {
 
 	if !reflect.DeepEqual(ctx.Global, expected) {
 		t.Error("Expected global values after loading imports did not match!")
+		t.Fail()
+	}
+}
+
+func TestExplicitPathLoading(t *testing.T) {
+	ctx, err := LoadContextFromFile("testdata/explicit-path.yaml")
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	expected := Context{
+		Name: "k8s.prod.mydomain.com",
+		ResourceSets: []ResourceSet{
+			{
+				Name: "some-api-europe",
+				Path: "some-api",
+				Values: map[string]interface{}{
+					"location": "europe",
+				},
+				Include: nil,
+				Parent:  "",
+			},
+			{
+				Name: "some-api-asia",
+				Path: "some-api",
+				Values: map[string]interface{}{
+					"location": "asia",
+				},
+				Include: nil,
+				Parent:  "",
+			},
+		},
+		BaseDir: "testdata",
+	}
+
+	if !reflect.DeepEqual(*ctx, expected) {
+		t.Error("Loaded context and expected context did not match")
+		t.Fail()
+	}
+}
+
+func TestExplicitSubresourcePathLoading(t *testing.T) {
+	ctx, err := LoadContextFromFile("testdata/explicit-subresource-path.yaml")
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	expected := Context{
+		Name: "k8s.prod.mydomain.com",
+		ResourceSets: []ResourceSet{
+			{
+				Name:   "parent/child",
+				Path:   "parent-path/child-path",
+				Parent: "parent",
+			},
+		},
+		BaseDir: "testdata",
+	}
+
+	if !reflect.DeepEqual(*ctx, expected) {
+		t.Error("Loaded context and expected context did not match")
 		t.Fail()
 	}
 }

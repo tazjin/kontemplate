@@ -9,6 +9,7 @@ import (
 
 type ResourceSet struct {
 	Name   string                 `json:"name"`
+	Path   string                 `json:"path"`
 	Values map[string]interface{} `json:"values"`
 
 	// Fields for resource set collections
@@ -41,7 +42,7 @@ func LoadContextFromFile(filename string) (*Context, error) {
 		)
 	}
 
-	c.ResourceSets = flattenResourceSetCollections(&c.ResourceSets)
+	c.ResourceSets = flattenPrepareResourceSetPaths(&c.ResourceSets)
 	c.BaseDir = path.Dir(filename)
 	c.ResourceSets = loadAllDefaultValues(&c)
 
@@ -73,19 +74,31 @@ func (ctx *Context) loadImportedVariables() error {
 	return nil
 }
 
-// Flattens resource set collections, i.e. resource sets that themselves have an additional 'include' field set.
+// Correctly prepares the file paths for resource sets by inferring implicit paths and flattening resource set
+// collections, i.e. resource sets that themselves have an additional 'include' field set.
 // Those will be regarded as a short-hand for including multiple resource sets from a subfolder.
 // See https://github.com/tazjin/kontemplate/issues/9 for more information.
-func flattenResourceSetCollections(rs *[]ResourceSet) []ResourceSet {
+func flattenPrepareResourceSetPaths(rs *[]ResourceSet) []ResourceSet {
 	flattened := make([]ResourceSet, 0)
 
 	for _, r := range *rs {
+		// If a path is not explicitly specified it should default to the resource set name.
+		// This is also the classic behaviour prior to kontemplate 1.2
+		if r.Path == "" {
+			r.Path = r.Name
+		}
+
 		if len(r.Include) == 0 {
 			flattened = append(flattened, r)
 		} else {
 			for _, subResourceSet := range r.Include {
+				if subResourceSet.Path == "" {
+					subResourceSet.Path = subResourceSet.Name
+				}
+
 				subResourceSet.Parent = r.Name
 				subResourceSet.Name = path.Join(r.Name, subResourceSet.Name)
+				subResourceSet.Path = path.Join(r.Path, subResourceSet.Path)
 				subResourceSet.Values = *util.Merge(&r.Values, &subResourceSet.Values)
 				flattened = append(flattened, subResourceSet)
 			}
@@ -114,13 +127,13 @@ func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	var defaultVars map[string]interface{}
 
 	// Attempt to load YAML values
-	err := util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Name, "default.yaml"), &defaultVars)
+	err := util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Path, "default.yaml"), &defaultVars)
 	if err == nil {
 		return util.Merge(&defaultVars, &rs.Values)
 	}
 
 	// Attempt to load JSON values
-	err = util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Name, "default.json"), &defaultVars)
+	err = util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Path, "default.json"), &defaultVars)
 	if err == nil {
 		return util.Merge(&defaultVars, &rs.Values)
 	}
