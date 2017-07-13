@@ -22,6 +22,7 @@ const failOnMissingKeys string = "missingkey=error"
 type TemplateNotFoundError struct {
 	meep.AllTraits
 	Name string
+	Path string
 }
 
 // Error that is caused during templating, e.g. required value being absent or invalid template format
@@ -64,14 +65,14 @@ func LoadAndApplyTemplates(include *[]string, exclude *[]string, c *context.Cont
 func processResourceSet(c *context.Context, rs *context.ResourceSet) (*RenderedResourceSet, error) {
 	fmt.Fprintf(os.Stderr, "Loading resources for %s\n", rs.Name)
 
-	rp := path.Join(c.BaseDir, rs.Name)
+	rp := path.Join(c.BaseDir, rs.Path)
 	files, err := ioutil.ReadDir(rp)
 
 	resources, err := processFiles(c, rs, rp, files)
 
 	if err != nil {
 		return nil, meep.New(
-			&TemplateNotFoundError{Name: rs.Name},
+			&TemplateNotFoundError{Name: rs.Name, Path: rs.Path},
 			meep.Cause(err),
 		)
 	}
