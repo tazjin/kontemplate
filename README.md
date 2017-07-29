@@ -15,6 +15,22 @@ In my experience this is often enough and more complex solutions such as
 
 Check out a Kontemplate setup example and the feature list below!
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Kontemplate - A simple Kubernetes templater](#kontemplate---a-simple-kubernetes-templater)
+    - [Features](#features)
+    - [Example](#example)
+    - [Installation](#installation)
+        - [Homebrew](#homebrew)
+        - [Arch Linux](#arch-linux)
+        - [Building repeatably from source](#building-repeatably-from-source)
+        - [Building from source](#building-from-source)
+    - [Usage](#usage)
+    - [Contributing](#contributing)
+
+<!-- markdown-toc end -->
+
 ## Features
 
 * [Simple, yet powerful templates](docs/templates.md)

@@ -12,6 +12,19 @@ or in which conditionals are evaluated for more complex template logic.
 It is recommended that you check out the Golang [documentation][] for the templating
 engine in addition to the cherry-picked features listed here.
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Kontemplate templates](#kontemplate-templates)
+    - [Basic variable interpolation](#basic-variable-interpolation)
+        - [Example:](#example)
+    - [Template functions](#template-functions)
+    - [Examples:](#examples)
+    - [Conditionals & ranges](#conditionals--ranges)
+    - [Caveats](#caveats)
+
+<!-- markdown-toc end -->
+
 ## Basic variable interpolation
 
 The basic template format uses `{{ .variableName }}` as the interpolation format.
