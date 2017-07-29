@@ -13,7 +13,16 @@ cluster), but with the same deployment files.
 In my experience this is often enough and more complex solutions such as
 [Helm][] are not required.
 
-## Overview
+Check out a Kontemplate setup example and the feature list below!
+
+## Features
+
+* [Simple, yet powerful templates](docs/templates.md)
+* [Clean cluster configuration files](docs/cluster-config.md)
+* [Integration with pass](docs/pass.md)
+* [Integration with kubectl](docs/kubectl.md)
+
+## Example
 
 Kontemplate lets you describe resources as you normally would in a simple folder structure:
 
@@ -146,6 +155,9 @@ kontemplate apply example/prod-cluster.yaml --dry-run
 # And actually apply it if you like what you see:
 kontemplate apply example/prod-cluster.yaml
 ```
+
+Check out the feature list and the individual feature documentation above and read the
+[best practices](docs/best-practices.md). Then you should be good to go!
 
 ## Contributing
 
