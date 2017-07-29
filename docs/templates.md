@@ -5,6 +5,13 @@ The template file format is based on Go's [templating engine][] in combination
 with a small extension library called [sprig][] that adds additional template
 functions.
 
+Go templates can either simply display variables or build more complicated
+*pipelines* in which variables are passed to functions for further processing,
+or in which conditionals are evaluated for more complex template logic.
+
+It is recommended that you check out the Golang [documentation][] for the templating
+engine in addition to the cherry-picked features listed here.
+
 ## Basic variable interpolation
 
 The basic template format uses `{{ .variableName }}` as the interpolation format.
@@ -66,7 +73,7 @@ certKeyPath: my-website/cert-key
 
 # The following interpolations are possible:
 
-{{ .name | upper }} 
+{{ .name | upper }}
 -> DONALD
 
 {{ .name | upper | repeat 2 }}
@@ -75,6 +82,39 @@ certKeyPath: my-website/cert-key
 {{ .certKeyPath | passLookup }}
 -> Returns content of 'my-website/cert-key' from pass
 ```
+
+## Conditionals & ranges
+
+Some logic is supported in Golang templates and can be used in Kontemplate, too.
+
+With the following values:
+
+```
+useKube2IAM: true
+servicePorts:
+  - 8080
+  - 9090
+```
+
+The following interpolations are possible:
+
+```
+# Conditionally insert something in the template:
+metadata:
+  annotations:
+    foo: bar
+    {{ if .useKube2IAM -}} iam.amazonaws.com/role: my-api {{- end }}
+```
+
+```
+# Iterate over a list of values
+ports:
+  {{ range .servicePorts }}
+  - port: {{ . }}
+  {{ end }}
+```
+
+Check out the Golang documentation (linked above) for more information about template logic.
 
 ## Caveats
 
@@ -86,6 +126,7 @@ You can perform some validation by using `kontemplate apply --dry-run` which
 will make use of the Dry-Run functionality in `kubectl`.
 
 [templating engine]: https://golang.org/pkg/text/template/
+[documentation]: https://golang.org/pkg/text/template/
 [sprig]: http://masterminds.github.io/sprig/
 [Go documentation]: https://golang.org/pkg/text/template/#hdr-Functions
 [pass]: https://www.passwordstore.org/
