@@ -73,7 +73,7 @@ As mentioned above, extra variables can be loaded from additional YAML or JSON f
 have a file called `test-secrets.yaml` which contains variables that should be shared between a `test`
 and `dev` cluster, you could include it in your context as such:
 
-```
+```yaml
 # test-secrets.yaml:
 mySecretVar: foo-bar-12345
 

@@ -19,6 +19,7 @@ Check out a Kontemplate setup example and the feature list below!
 
 * [Simple, yet powerful templates](docs/templates.md)
 * [Clean cluster configuration files](docs/cluster-config.md)
+* [Resources organised as simple resource sets](docs/resource-sets.md)
 * [Integration with pass](docs/pass.md)
 * [Integration with kubectl](docs/kubectl.md)
 
