@@ -5,6 +5,23 @@ Resource sets are collections of Kubernetes resources that should be passed to `
 
 Technically a resource set is simply a folder with a few YAML and/or JSON templates in it.
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Resource Sets](#resource-sets)
+- [Creating resource sets](#creating-resource-sets)
+    - [Default variables](#default-variables)
+- [Including resource sets](#including-resource-sets)
+    - [Fields](#fields)
+        - [`name`](#name)
+        - [`path`](#path)
+        - [`values`](#values)
+        - [`include`](#include)
+    - [Multiple includes](#multiple-includes)
+    - [Nesting resource sets](#nesting-resource-sets)
+        - [Caveats](#caveats)
+
+<!-- markdown-toc end -->
 
 # Creating resource sets
 

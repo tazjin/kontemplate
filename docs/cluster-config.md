@@ -31,6 +31,19 @@ include:
       - name: pub-service
 ```
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Cluster configuration](#cluster-configuration)
+    - [Fields](#fields)
+        - [`context`](#context)
+        - [`global`](#global)
+        - [`import`](#import)
+        - [`include`](#include)
+    - [External variables](#external-variables)
+
+<!-- markdown-toc end -->
+
 ## Fields
 
 This is documentation for the individual fields in a cluster context file.

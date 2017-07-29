@@ -1,6 +1,14 @@
 Kontemplate tips & tricks
 =========================
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Kontemplate tips & tricks](#kontemplate-tips--tricks)
+    - [Update Deployments when ConfigMaps change](#update-deployments-when-configmaps-change)
+    - [direnv & pass](#direnv--pass)
+
+<!-- markdown-toc end -->
 
 ## Update Deployments when ConfigMaps change
 
