@@ -9,11 +9,11 @@ import (
 
 type ResourceSet struct {
 	// Name of the resource set. This can be used in include/exclude statements during kontemplate runs.
-	Name   string                 `json:"name"`
+	Name string `json:"name"`
 
 	// Path to the folder containing the files for this resource set. This defaults to the value of the 'name' field
 	// if unset.
-	Path   string                 `json:"path"`
+	Path string `json:"path"`
 
 	// Values to include when interpolating resources from this resource set.
 	Values map[string]interface{} `json:"values"`
@@ -22,24 +22,24 @@ type ResourceSet struct {
 	Include []ResourceSet `json:"include"`
 
 	// Parent resource set for flattened resource sets. Should not be manually specified.
-	Parent  string
+	Parent string
 }
 
 type Context struct {
 	// The name of the kubectl context
-	Name            string                 `json:"context"`
+	Name string `json:"context"`
 
 	// Global variables that should be accessible by all resource sets
-	Global          map[string]interface{} `json:"global"`
+	Global map[string]interface{} `json:"global"`
 
 	// File names of YAML or JSON files including extra variables that should be globally accessible
-	VariableImports []string               `json:"import"`
+	VariableImports []string `json:"import"`
 
 	// The resource sets to include in this context
-	ResourceSets    []ResourceSet          `json:"include"`
+	ResourceSets []ResourceSet `json:"include"`
 
 	// This field represents the absolute path to the context base directory and should not be manually specified.
-	BaseDir         string
+	BaseDir string
 }
 
 type ContextLoadingError struct {
