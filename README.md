@@ -3,7 +3,7 @@ Kontemplate - A simple Kubernetes templater
 
 [![Build Status](https://travis-ci.org/tazjin/kontemplate.svg?branch=master)](https://travis-ci.org/tazjin/kontemplate)
 
-Kontemplate is a simple CLI tool that can take sets of Kubernetes resource
+[Kontemplate][] is a simple CLI tool that can take sets of Kubernetes resource
 files with placeholders and insert values per environment.
 
 This tool was made because in many cases all I want in terms of Kubernetes
@@ -182,6 +182,7 @@ Feel free to contribute pull requests, file bugs and open issues with feature su
 
 Please follow the [code of conduct](CODE_OF_CONDUCT.md).
 
+[Kontemplate]: http://kontemplate.works
 [Helm]: https://helm.sh/
 [releases page]: https://github.com/tazjin/kontemplate/releases
 [AUR package]: https://aur.archlinux.org/packages/kontemplate-git/
