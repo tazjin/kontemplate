@@ -10,7 +10,7 @@ inputs:
   # Kontemplate dependencies!
   "/go/src/github.com/polydawn/meep":
     type: "git"
-    hash: "296620394aa9cbcce7cfe9ad903489b8057662bc"
+    hash: "eaf1db2168fe380b4da17a35f0adddb5ae15a651"
     silo: "https://github.com/polydawn/meep"
   "/go/src/github.com/Masterminds/sprig":
     type: "git"
@@ -22,11 +22,11 @@ inputs:
     silo: "https://github.com/ghodss/yaml"
   "/go/src/gopkg.in/yaml.v2":
     type: "git"
-    hash: "cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b"
+    hash: "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
     silo: "https://gopkg.in/yaml.v2"
   "/go/src/gopkg.in/alecthomas/kingpin.v2":
     type: "git"
-    hash: "7f0871f2e17818990e4eed73f9b5c2f429501228"
+    hash: "1087e65c9441605df944fb12c33f0fe7072d18ca"
     silo: "https://gopkg.in/alecthomas/kingpin.v2"
   "/go/src/github.com/alecthomas/template":
     type: "git"
@@ -38,7 +38,7 @@ inputs:
     silo: "https://github.com/alecthomas/units"
   "/go/src/github.com/Masterminds/semver":
     type: "git"
-    hash: "abff1900528dbdaf6f3f5aa92c398be1eaf2a9f7"
+    hash: "517734cc7d6470c0d07130e40fd40bdeb9bcd3fd"
     silo: "https://github.com/Masterminds/semver"
   "/go/src/github.com/aokoli/goutils":
     type: "git"
