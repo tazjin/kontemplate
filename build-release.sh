@@ -35,15 +35,15 @@ function sign-for() {
     local os="${1}"
     local arch="${2}"
     local target="release/${os}/${arch}"
-    local bin="${target}/kontemplate"
-    local hash="$(sha256sum ${bin})"
+    local bin=$(binary-name "${os}" "${target}")
     local tar="release/kontemplate-${VERSION}-${os}-${arch}.tar.gz"
 
-    echo "Signing kontemplate binary for ${os}-${arch} with SHA256 ${hash}"
-    gpg --sign "${bin}"
-
     echo "Packing release into ${tar}"
-    tar czvf "${tar}" -C "${target}" kontemplate kontemplate.gpg
+    tar czvf "${tar}" -C "${target}" $(basename "${bin}")
+
+    local hash=$(sha256sum "${tar}")
+    echo "Signing kontemplate release tarball for ${os}-${arch} with SHA256 ${hash}"
+    gpg --armor --detach-sig --sign "${tar}"
 }
 
 case "${1}" in
@@ -56,7 +56,7 @@ case "${1}" in
         exit 0
         ;;
     "sign")
-        # Sign releases:
+        # Bundle and sign releases:
         sign-for "linux" "amd64"
         sign-for "darwin" "amd64"
         sign-for "windows" "amd64"
