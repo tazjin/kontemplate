@@ -83,6 +83,11 @@ func templateCommand() {
 	_, resourceSets := loadContextAndResources(templateFile)
 
 	for _, rs := range *resourceSets {
+		if len(rs.Resources) == 0 {
+			fmt.Fprintf(os.Stderr, "Warning: Resource set '%s' contains no valid templates\n", rs.Name)
+			break
+		}
+
 		for _, r := range rs.Resources {
 			fmt.Fprintf(os.Stderr, "Rendered file %s/%s:\n", rs.Name, r.Filename)
 			fmt.Println(r.Rendered)
@@ -150,7 +155,12 @@ func loadContextAndResources(file *string) (*context.Context, *[]templater.Rende
 func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resourceSets *[]templater.RenderedResourceSet) error {
 	args := append(*kubectlArgs, fmt.Sprintf("--context=%s", c.Name))
 
-	for _, resourceSet := range *resourceSets {
+	for _, rs := range *resourceSets {
+		if len(rs.Resources) == 0 {
+			fmt.Fprintf(os.Stderr, "Warning: Resource set '%s' contains no valid templates\n", rs.Name)
+			continue
+		}
+
 		kubectl := exec.Command("kubectl", args...)
 
 		stdin, err := kubectl.StdinPipe()
@@ -165,8 +175,8 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 			return meep.New(&KubeCtlError{}, meep.Cause(err))
 		}
 
-		for _, r := range resourceSet.Resources {
-			fmt.Printf("Passing file %s/%s to kubectl\n", resourceSet.Name, r.Filename)
+		for _, r := range rs.Resources {
+			fmt.Printf("Passing file %s/%s to kubectl\n", rs.Name, r.Filename)
 			fmt.Fprintln(stdin, r.Rendered)
 		}
 		stdin.Close()
