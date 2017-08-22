@@ -5,10 +5,21 @@ readonly GIT_HASH="$(git rev-parse --short HEAD)"
 readonly LDFLAGS="-X main.gitHash=${GIT_HASH} -w -s"
 readonly VERSION="1.1.0-${GIT_HASH}"
 
+function binary-name() {
+    local os="${1}"
+    local target="${2}"
+    if [ "${os}" = "windows" ]; then
+        echo -n "${target}/kontemplate.exe"
+    else
+        echo -n "${target}/kontemplate"
+    fi
+}
+
 function build-for() {
     local os="${1}"
     local arch="${2}"
     local target="release/${os}/${arch}"
+    local bin=$(binary-name "${os}" "${target}")
 
     echo "Building kontemplate for ${os}-${arch} in ${target}"
 
@@ -16,7 +27,7 @@ function build-for() {
 
     env GOOS="${os}" GOARCH="${arch}" go build \
         -ldflags "${LDFLAGS}" \
-        -o "${target}/kontemplate" \
+        -o "${bin}" \
         -tags netgo
 }
 
