@@ -143,16 +143,13 @@ func loadAllDefaultValues(c *Context) []ResourceSet {
 func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	var defaultVars map[string]interface{}
 
-	// Attempt to load YAML values
-	err := util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Path, "default.yaml"), &defaultVars)
-	if err == nil {
-		return util.Merge(&defaultVars, &rs.Values)
-	}
+	defaultFilenames := []string{"default.yml", "default.yaml", "default.json"}
 
-	// Attempt to load JSON values
-	err = util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Path, "default.json"), &defaultVars)
-	if err == nil {
-		return util.Merge(&defaultVars, &rs.Values)
+	for _, filename := range defaultFilenames {
+		err := util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Path, filename), &defaultVars)
+		if err == nil {
+			return util.Merge(&defaultVars, &rs.Values)
+		}
 	}
 
 	// The actual error is not inspected here. The reasoning for this is that in case of serious problems (e.g.
