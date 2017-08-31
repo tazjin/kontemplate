@@ -143,9 +143,7 @@ func loadAllDefaultValues(c *Context) []ResourceSet {
 func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	var defaultVars map[string]interface{}
 
-	defaultFilenames := []string{"default.yml", "default.yaml", "default.json"}
-
-	for _, filename := range defaultFilenames {
+	for _, filename := range util.DefaultFilenames {
 		err := util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Path, filename), &defaultVars)
 		if err == nil {
 			return util.Merge(&defaultVars, &rs.Values)
