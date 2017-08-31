@@ -9,6 +9,9 @@ import (
 	"github.com/ghodss/yaml"
 )
 
+// Filenames excluded from templating for the purpose of containing default variable values inside a resource set.
+var DefaultFilenames []string = []string{"default.yml", "default.yaml", "default.json"}
+
 // Merges two maps together. Values from the second map override values in the first map.
 // The returned map is new if anything was changed.
 func Merge(in1 *map[string]interface{}, in2 *map[string]interface{}) *map[string]interface{} {
