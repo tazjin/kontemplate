@@ -180,6 +180,7 @@ func templateFuncs() template.FuncMap {
 		return string(b)
 	}
 	m["passLookup"] = GetFromPass
+	m["lookupIPAddr"] = GetIPsFromDNS
 
 	return m
 }
