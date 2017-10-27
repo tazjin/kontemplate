@@ -85,7 +85,7 @@ func templateCommand() {
 	for _, rs := range *resourceSets {
 		if len(rs.Resources) == 0 {
 			fmt.Fprintf(os.Stderr, "Warning: Resource set '%s' contains no valid templates\n", rs.Name)
-			break
+			continue
 		}
 
 		for _, r := range rs.Resources {
