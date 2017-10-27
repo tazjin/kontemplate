@@ -66,7 +66,10 @@ func processResourceSet(c *context.Context, rs *context.ResourceSet) (*RenderedR
 	fmt.Fprintf(os.Stderr, "Loading resources for %s\n", rs.Name)
 
 	rp := path.Join(c.BaseDir, rs.Path)
-	files, err := ioutil.ReadDir(rp)
+
+	// Explicitly discard this error, which will give us an empty list of files instead.
+	// This will end up printing a warning to the user, but it won't stop the rest of the process.
+	files, _ := ioutil.ReadDir(rp)
 
 	resources, err := processFiles(c, rs, rp, files)
 
