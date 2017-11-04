@@ -1,5 +1,2 @@
 ---
-language: go
-before_script:
-  - if [[ -n "$(go fmt ./...)" ]]; then echo 'Run go fmt!' && exit 1; fi
-  - go vet ./...
+language: rust
