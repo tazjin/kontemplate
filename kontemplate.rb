@@ -3,9 +3,9 @@
 class Kontemplate < Formula
   desc "Kontemplate - Extremely simple Kubernetes resource templates"
   homepage "https://github.com/tazjin/kontemplate"
-  url "https://github.com/tazjin/kontemplate/releases/download/v1.2.0/kontemplate-1.2.0-f8b6ad6-darwin-amd64.tar.gz"
-  sha256 "0cda70956b4d4e4944d5760970aaf20d586ef9d62ee90e2d67b70f03ed85e075"
-  version "1.2.0-f8b6ad6"
+  url "https://github.com/tazjin/kontemplate/releases/download/v1.3.0/kontemplate-1.3.0-98daa6b-darwin-amd64.tar.gz"
+  sha256 "4372e2c0f1249aa43f67e664335c20748d0b394ada1fcceefa3ae786e839ee47"
+  version "1.3.0-98daa6b"
 
   def install
     bin.install "kontemplate"
