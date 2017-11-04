@@ -35,7 +35,6 @@ fn main() {
         path: "test".into(),
         values: Default::default(),
         include: Vec::new(),
-        parent: "foo".into(),
     };
     let res = templater::template_resource_set(&rs).expect("Oioi");
 
