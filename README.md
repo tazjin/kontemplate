@@ -36,8 +36,8 @@ Check out a Kontemplate setup example and the feature list below!
 * [Simple, yet powerful templates](docs/templates.md)
 * [Clean cluster configuration files](docs/cluster-config.md)
 * [Resources organised as simple resource sets](docs/resource-sets.md)
-* [Integration with pass](docs/pass.md)
-* [Integration with kubectl](docs/kubectl.md)
+* Integration with pass
+* Integration with kubectl
 
 ## Example
 
@@ -173,8 +173,7 @@ kontemplate apply example/prod-cluster.yaml --dry-run
 kontemplate apply example/prod-cluster.yaml
 ```
 
-Check out the feature list and the individual feature documentation above and read the
-[best practices](docs/best-practices.md). Then you should be good to go!
+Check out the feature list and the individual feature documentation above. Then you should be good to go!
 
 ## Contributing
 
