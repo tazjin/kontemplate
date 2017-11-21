@@ -1,5 +1,15 @@
-// This file contains the implementation of a template function for retrieving variables from 'pass', the standard UNIX
-// password manager.
+// Copyright (C) 2016-2017  Vincent Ambo <mail@tazj.in>
+//
+// This file is part of Kontemplate.
+//
+// Kontemplate is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This file contains the implementation of a template function for retrieving
+// variables from 'pass', the standard UNIX password manager.
+
 package templater
 
 import (

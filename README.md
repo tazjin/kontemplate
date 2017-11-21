@@ -179,6 +179,9 @@ Check out the feature list and the individual feature documentation above. Then 
 
 Feel free to contribute pull requests, file bugs and open issues with feature suggestions!
 
+Kontemplate is licensed under the GPLv3, a copy of the license and its terms can be found
+in the `LICENSE` file.
+
 Please follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 [Kontemplate]: http://kontemplate.works
