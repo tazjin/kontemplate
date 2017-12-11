@@ -55,7 +55,7 @@ The `context` field contains the name of the kubectl-context. You can list conte
 
 This must be set here so that Kontemplate can use the correct context when calling kubectl.
 
-This field is **required**.
+This field is **required** for `kubectl`-wrapping commands. It can be left out if only the `template`-command is used.
 
 ### `global`
 
