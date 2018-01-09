@@ -193,6 +193,7 @@ func templateFuncs() template.FuncMap {
 	}
 	m["passLookup"] = GetFromPass
 	m["lookupIPAddr"] = GetIPsFromDNS
+	m["fileContent"] = GetFromFile
 
 	return m
 }
