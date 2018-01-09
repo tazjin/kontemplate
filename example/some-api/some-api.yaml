@@ -25,6 +25,8 @@ spec:
               value: {{ .importantFeature }}
             - name: SOME_GLOBAL_VAR
               value: {{ .globalVar }}
+            - name: FILE_VAR
+              value: {{ fileContent "some-api/filevar.txt" }}
 ---
 apiVersion: v1
 kind: Service
