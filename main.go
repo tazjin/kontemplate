@@ -192,7 +192,7 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 
 		for _, r := range rs.Resources {
 			fmt.Printf("Passing file %s/%s to kubectl\n", rs.Name, r.Filename)
-			fmt.Fprintln(stdin, r.Rendered)
+			fmt.Fprintf(stdin, "---\n%s\n", r.Rendered)
 		}
 		stdin.Close()
 
