@@ -4,7 +4,18 @@ kind: Secret
 metadata:
   name: secret-certificate
 data:
-  cert.pem: {{ passLookup "my/secret/certificate" | b64enc }}
+  cert.pem: { passLookup "my/secret/certificate" | b64enc }}
+---
+apiVersion: extensions/v1beta1
+kind: ConfigMap
+metadata:
+  name: some-config
+data:
+  # The content of the example configuration file is templated in here
+  # by the 'insertFile' function and indented for YAML-compatibility
+  # with the 'indent' function:
+  some.cfg: |
+{{ insertFile "some.cfg" | indent 4 }}
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -25,8 +36,6 @@ spec:
               value: {{ .importantFeature }}
             - name: SOME_GLOBAL_VAR
               value: {{ .globalVar }}
-            - name: FILE_VAR
-              value: {{ fileContent "some-api/filevar.txt" }}
 ---
 apiVersion: v1
 kind: Service
