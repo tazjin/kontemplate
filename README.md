@@ -114,13 +114,6 @@ brew install kontemplate
 
 An [AUR package][] is available for Arch Linux and other `pacman`-based distributions.
 
-### Building repeatably from source
-
-Version pinning for Go dependencies is provided by a [Repeatr][] formula. After cloning
-the repository the latest release can be built with `repeatr run kontemplate.frm`.
-
-This will place release binaries in the `release` folder.
-
 ### Building from source
 
 Assuming you have Go configured correctly, you can simply `go get github.com/tazjin/kontemplate/...`.
