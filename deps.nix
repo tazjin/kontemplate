@@ -73,15 +73,6 @@
     };
   }
   {
-    goPackagePath = "github.com/polydawn/meep";
-    fetch = {
-      type   = "git";
-      url    = "https://github.com/polydawn/meep";
-      rev    = "eaf1db2168fe380b4da17a35f0adddb5ae15a651";
-      sha256 = "12n134fb2imnj67xkbznzm0gqkg36hdxwr960y91qb5s2q2krxir";
-    };
-  }
-  {
     goPackagePath = "github.com/satori/go.uuid";
     fetch = {
       type   = "git";

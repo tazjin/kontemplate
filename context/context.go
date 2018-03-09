@@ -10,9 +10,9 @@
 package context
 
 import (
+	"fmt"
 	"path"
 
-	"github.com/polydawn/meep"
 	"github.com/tazjin/kontemplate/util"
 )
 
@@ -51,9 +51,8 @@ type Context struct {
 	BaseDir string
 }
 
-type ContextLoadingError struct {
-	meep.AllTraits
-	Filename string
+func contextLoadingError(filename string, cause error) error {
+	return fmt.Errorf("Context loading failed on file %s due to: \n%v", filename, cause)
 }
 
 // Attempt to load and deserialise a Context from the specified file.
@@ -62,10 +61,7 @@ func LoadContextFromFile(filename string) (*Context, error) {
 	err := util.LoadJsonOrYaml(filename, &c)
 
 	if err != nil {
-		return nil, meep.New(
-			&ContextLoadingError{Filename: filename},
-			meep.Cause(err),
-		)
+		return nil, contextLoadingError(filename, err)
 	}
 
 	c.ResourceSets = flattenPrepareResourceSetPaths(&c.ResourceSets)
@@ -74,10 +70,7 @@ func LoadContextFromFile(filename string) (*Context, error) {
 
 	err = c.loadImportedVariables()
 	if err != nil {
-		return nil, meep.New(
-			&ContextLoadingError{Filename: filename},
-			meep.Cause(err),
-		)
+		return nil, contextLoadingError(filename, err)
 	}
 
 	return &c, nil

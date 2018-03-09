@@ -14,26 +14,16 @@ package templater
 
 import (
 	"fmt"
-	"github.com/polydawn/meep"
 	"net"
 	"os"
 )
-
-type DNSError struct {
-	meep.TraitAutodescribing
-	meep.TraitCausable
-	Output string
-}
 
 func GetIPsFromDNS(host string) ([]interface{}, error) {
 	fmt.Fprintf(os.Stderr, "Attempting to look up IP for %s in DNS\n", host)
 	ips, err := net.LookupIP(host)
 
 	if err != nil {
-		return nil, meep.New(
-			&DNSError{Output: "IP address lookup failed"},
-			meep.Cause(err),
-		)
+		return nil, fmt.Errorf("IP address lookup failed: %v", err)
 	}
 
 	var result []interface{} = make([]interface{}, len(ips))
