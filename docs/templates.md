@@ -74,9 +74,10 @@ Some template functions come from Go's standard library and are listed in the
 [Go documentation][]. In addition the functions declared by [sprig][] are
 available in kontemplate, as well as three custom functions:
 
-`json`: Encodes any supplied data structure as JSON.
-`passLookup`: Looks up the supplied key in [pass][].
-`fromFile`: Insert the contents of the given file from the resource set folder.
+* `json`: Encodes any supplied data structure as JSON.
+* `passLookup`: Looks up the supplied key in [pass][].
+* `insertFile`: Insert the contents of the given file in the resource
+  set folder as a string.
 
 ## Examples:
 
