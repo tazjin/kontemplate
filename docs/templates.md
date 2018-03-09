@@ -72,10 +72,11 @@ right.
 
 Some template functions come from Go's standard library and are listed in the
 [Go documentation][]. In addition the functions declared by [sprig][] are
-available in kontemplate, as well as two custom functions:
+available in kontemplate, as well as three custom functions:
 
 `json`: Encodes any supplied data structure as JSON.
 `passLookup`: Looks up the supplied key in [pass][]
+`fromFile`: Pastes the content of the given files name.
 
 ## Examples:
 
