@@ -20,25 +20,11 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
-	"github.com/polydawn/meep"
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/util"
 )
 
 const failOnMissingKeys string = "missingkey=error"
-
-// Error that is caused by non-existent template files being specified
-type TemplateNotFoundError struct {
-	meep.AllTraits
-	Name string
-	Path string
-}
-
-// Error that is caused during templating, e.g. required value being absent or invalid template format
-type TemplatingError struct {
-	meep.TraitAutodescribing
-	meep.TraitCausable
-}
 
 type RenderedResource struct {
 	Filename string
@@ -83,10 +69,7 @@ func processResourceSet(c *context.Context, rs *context.ResourceSet) (*RenderedR
 	resources, err := processFiles(c, rs, rp, files)
 
 	if err != nil {
-		return nil, meep.New(
-			&TemplateNotFoundError{Name: rs.Name, Path: rs.Path},
-			meep.Cause(err),
-		)
+		return nil, err
 	}
 
 	return &RenderedResourceSet{
@@ -122,10 +105,7 @@ func templateFile(c *context.Context, rs *context.ResourceSet, filename string) 
 	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs(rs)).Option(failOnMissingKeys).ParseFiles(filename)
 
 	if err != nil {
-		return "", meep.New(
-			&TemplateNotFoundError{Name: filename},
-			meep.Cause(err),
-		)
+		return "", fmt.Errorf("Template %s not found: %v", filename, err)
 	}
 
 	var b bytes.Buffer
@@ -135,10 +115,7 @@ func templateFile(c *context.Context, rs *context.ResourceSet, filename string) 
 	err = tpl.Execute(&b, rs.Values)
 
 	if err != nil {
-		return "", meep.New(
-			&TemplatingError{},
-			meep.Cause(err),
-		)
+		return "", fmt.Errorf("Error while templating %s: %v", filename, err)
 	}
 
 	return b.String(), nil

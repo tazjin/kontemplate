@@ -16,16 +16,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-
-	"github.com/polydawn/meep"
 	"strings"
 )
-
-type PassError struct {
-	meep.TraitAutodescribing
-	meep.TraitCausable
-	Output string
-}
 
 func GetFromPass(key string) (string, error) {
 	fmt.Fprintf(os.Stderr, "Attempting to look up %s in pass\n", key)
@@ -33,10 +25,7 @@ func GetFromPass(key string) (string, error) {
 
 	output, err := pass.CombinedOutput()
 	if err != nil {
-		return "", meep.New(
-			&PassError{Output: string(output)},
-			meep.Cause(err),
-		)
+		return "", fmt.Errorf("Pass lookup failed: %s (%v)", output, err)
 	}
 
 	trimmed := strings.TrimSpace(string(output))

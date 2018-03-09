@@ -4,7 +4,7 @@ kind: Secret
 metadata:
   name: secret-certificate
 data:
-  cert.pem: { passLookup "my/secret/certificate" | b64enc }}
+  cert.pem: {{ passLookup "my/secret/certificate" | b64enc }}
 ---
 apiVersion: extensions/v1beta1
 kind: ConfigMap
