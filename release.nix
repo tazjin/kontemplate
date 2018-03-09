@@ -10,13 +10,13 @@
 # This file is the Nix derivation used to build release binaries for
 # several different architectures and operating systems.
 
-{ pkgs ? import <nixpkgs> {} }:
-
-with pkgs; let buildGo110Package =
-  callPackage <nixpkgs/pkgs/development/go-modules/generic> {
-  go = go_1_10;
-};
-in buildGo110Package rec {
+let pkgs = import ((import <nixpkgs> {}).fetchFromGitHub {
+  owner  = "NixOS";
+  repo   = "nixpkgs";
+  rev    = "1bc5bf4beb759e563ffc7a8a3067f10a00b45a7d";
+  sha256 = "00gd96p7yz3rgpjjkizp397y2syfc272yvwxqixbjd1qdshbizmj";
+}) {};
+in with pkgs; buildGoPackage rec {
   name = "kontemplate-${version}";
   version = "master";
   src = ./.;
