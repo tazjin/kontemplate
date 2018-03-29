@@ -171,7 +171,7 @@ func templateFuncs(rs *context.ResourceSet) template.FuncMap {
 	}
 	m["passLookup"] = GetFromPass
 	m["gitHEAD"] = func() (string, error) {
-			out, err := exec.Command("sh", "-c", "git rev-parse HEAD").Output()
+			out, err := exec.Command("git", "rev-parse", "HEAD").Output()
 			if err != nil {
 				return "", err
 			}
