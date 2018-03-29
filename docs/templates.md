@@ -75,6 +75,7 @@ Some template functions come from Go's standard library and are listed in the
 available in kontemplate, as well as three custom functions:
 
 * `json`: Encodes any supplied data structure as JSON.
+* `gitHEAD`: Retrieves the commit hash at Git `HEAD`.
 * `passLookup`: Looks up the supplied key in [pass][].
 * `insertFile`: Insert the contents of the given file in the resource
   set folder as a string.
@@ -96,6 +97,9 @@ certKeyPath: my-website/cert-key
 
 {{ .certKeyPath | passLookup }}
 -> Returns content of 'my-website/cert-key' from pass
+
+{{ gitHEAD }}
+-> Returns the Git commit hash at HEAD.
 ```
 
 ## Conditionals & ranges
