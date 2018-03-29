@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 	"text/template"
@@ -169,6 +170,14 @@ func templateFuncs(rs *context.ResourceSet) template.FuncMap {
 		return string(b)
 	}
 	m["passLookup"] = GetFromPass
+	m["gitHEAD"] = func() (string, error) {
+			out, err := exec.Command("sh", "-c", "git rev-parse HEAD").Output()
+			if err != nil {
+				return "", err
+			}
+			output := strings.TrimSpace(string(out))
+			return output, nil
+		}
 	m["lookupIPAddr"] = GetIPsFromDNS
 	m["insertFile"] = func(file string) (string, error) {
 		data, err := ioutil.ReadFile(path.Join(rs.Path, file))
