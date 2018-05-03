@@ -103,7 +103,7 @@ func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files 
 }
 
 func templateFile(c *context.Context, rs *context.ResourceSet, filename string) (string, error) {
-	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs(rs)).Option(failOnMissingKeys).ParseFiles(filename)
+	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs(c, rs)).Option(failOnMissingKeys).ParseFiles(filename)
 
 	if err != nil {
 		return "", fmt.Errorf("Template %s not found: %v", filename, err)
@@ -163,7 +163,7 @@ func matchesResourceSet(s *[]string, rs *context.ResourceSet) bool {
 	return false
 }
 
-func templateFuncs(rs *context.ResourceSet) template.FuncMap {
+func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap {
 	m := sprig.TxtFuncMap()
 	m["json"] = func(data interface{}) string {
 		b, _ := json.Marshal(data)
@@ -171,13 +171,13 @@ func templateFuncs(rs *context.ResourceSet) template.FuncMap {
 	}
 	m["passLookup"] = GetFromPass
 	m["gitHEAD"] = func() (string, error) {
-			out, err := exec.Command("git", "rev-parse", "HEAD").Output()
-			if err != nil {
-				return "", err
-			}
-			output := strings.TrimSpace(string(out))
-			return output, nil
+		out, err := exec.Command("git", "-C", c.BaseDir, "rev-parse", "HEAD").Output()
+		if err != nil {
+			return "", err
 		}
+		output := strings.TrimSpace(string(out))
+		return output, nil
+	}
 	m["lookupIPAddr"] = GetIPsFromDNS
 	m["insertFile"] = func(file string) (string, error) {
 		data, err := ioutil.ReadFile(path.Join(rs.Path, file))
