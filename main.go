@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/templater"
@@ -99,15 +100,41 @@ func templateCommand() {
 			continue
 		}
 
-		for _, r := range rs.Resources {
-			fmt.Fprintf(os.Stderr, "Rendered file %s/%s:\n", rs.Name, r.Filename)
-			if *templateOutputDir != "" {
-				os.MkdirAll(*templateOutputDir, 0777)
-				f, _ := os.Create(*templateOutputDir + "/" + r.Filename)
-				fmt.Fprintf(f, r.Rendered)
-			} else {
+		if *templateOutputDir != "" {
+			templateIntoDirectory(templateOutputDir, rs)
+		} else {
+			for _, r := range rs.Resources {
+				fmt.Fprintf(os.Stderr, "Rendered file %s/%s:\n", rs.Name, r.Filename)
 				fmt.Println(r.Rendered)
 			}
+		}
+	}
+}
+
+func templateIntoDirectory(outputDir *string, rs templater.RenderedResourceSet) {
+	// Attempt to create the output directory if it does not
+	// already exist:
+	if err := os.MkdirAll(*templateOutputDir, 0775); err != nil {
+		app.Fatalf("Could not create output directory: %v\n", err)
+	}
+
+	// Nested resource sets may contain slashes in their names.
+	// These are replaced with dashes for the purpose of writing a
+	// flat list of output files:
+	setName := strings.Replace(rs.Name, "/", "-", -1)
+
+	for _, r := range rs.Resources {
+		filename := fmt.Sprintf("%s/%s-%s", *templateOutputDir, setName, r.Filename)
+		fmt.Fprintf(os.Stderr, "Writing file %s\n", filename)
+
+		file, err := os.Create(filename)
+		if err != nil {
+			app.Fatalf("Could not create file %s: %v\n", filename, err)
+		}
+
+		_, err = fmt.Fprintf(file, r.Rendered)
+		if err != nil {
+			app.Fatalf("Error writing file %s: %v\n", filename, err)
 		}
 	}
 }
