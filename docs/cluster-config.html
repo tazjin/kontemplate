@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>cluster-config.html</title>
+
+</head>
+
+<body>
+
+<h1>Cluster configuration</h1>
+
+<p>Every cluster (or &ldquo;environment&rdquo;) that requires individual configuration is specified in
+a very simple YAML file in Kontemplate.</p>
+
+<p>An example file for a hypothetical test environment could look like this:</p>
+
+<h2>```yaml</h2>
+
+<p>context: k8s.test.mydomain.com
+global:
+  clusterName: test-cluster
+  defaultReplicas: 2
+import:
+  - test-secrets.yaml
+include:
+  - name: gateway
+    path: tools/nginx
+    values:
+      tlsDomains:
+        - test.oslo.pub
+        - test.tazj.in
+  - path: backend
+    values:
+      env: test
+    include:
+      - name: blog
+        values:
+          url: test.tazj.in
+      - name: pub-service
+```</p>
+
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+
+
+<p><strong>Table of Contents</strong></p>
+
+<ul>
+<li><a href="#cluster-configuration">Cluster configuration</a>
+
+<ul>
+<li><a href="#fields">Fields</a>
+
+<ul>
+<li><a href="#context"><code>context</code></a></li>
+<li><a href="#global"><code>global</code></a></li>
+<li><a href="#import"><code>import</code></a></li>
+<li><a href="#include"><code>include</code></a></li>
+</ul>
+</li>
+<li><a href="#external-variables">External variables</a></li>
+</ul>
+</li>
+</ul>
+
+
+<!-- markdown-toc end -->
+
+
+<h2>Fields</h2>
+
+<p>This is documentation for the individual fields in a cluster context file.</p>
+
+<h3><code>context</code></h3>
+
+<p>The <code>context</code> field contains the name of the kubectl-context. You can list context names with
+&lsquo;kubectl config get-contexts&rsquo;.</p>
+
+<p>This must be set here so that Kontemplate can use the correct context when calling kubectl.</p>
+
+<p>This field is <strong>required</strong> for <code>kubectl</code>-wrapping commands. It can be left out if only the <code>template</code>-command is used.</p>
+
+<h3><code>global</code></h3>
+
+<p>The <code>global</code> field contains a key/value map of variables that should be available to all resource
+sets in the cluster.</p>
+
+<p>This field is <strong>optional</strong>.</p>
+
+<h3><code>import</code></h3>
+
+<p>The <code>import</code> field contains the file names of additional YAML or JSON files from which global
+variables should be loaded. Using this field makes it possible to keep certain configuration that
+is the same for some, but not all, clusters in a common place.</p>
+
+<p>This field is <strong>optional</strong>.</p>
+
+<h4>Standard Input</h4>
+
+<p>Additionally you may pipe YAML or JSON data via stdin which will be read as global variables
+as if you had used <code>import</code> on standard input.</p>
+
+<h3><code>include</code></h3>
+
+<p>The <code>include</code> field contains the actual resource sets to be included in the cluster.</p>
+
+<p>Information about the structure of resource sets can be found in the <a href="resource-sets.md">resource set documentation</a>.</p>
+
+<p>This field is <strong>required</strong>.</p>
+
+<h2>External variables</h2>
+
+<p>As mentioned above, extra variables can be loaded from additional YAML or JSON files. Assuming you
+have a file called <code>test-secrets.yaml</code> which contains variables that should be shared between a <code>test</code>
+and <code>dev</code> cluster, you could include it in your context as such:</p>
+
+<p>```yaml</p>
+
+<h1>test-secrets.yaml:</h1>
+
+<p>mySecretVar: foo-bar-12345</p>
+
+<h1>test-cluster.yaml:</h1>
+
+<p>context: k8s.test.mydomain.com
+include:
+  - test-secrets.yaml</p>
+
+<h1>dev-cluster.yaml:</h1>
+
+<p>context: k8s.dev.mydomain.com
+include:
+  - test-secrets.yaml
+```</p>
+
+<p>The variable <code>mySecretVar</code> is then available as a global variable.</p>
+
+<h3>External variables via stdin</h3>
+
+<p>Similarly you can provide extra variables with standard input.
+```yaml</p>
+
+<h1>test-cluster.yaml</h1>
+
+<p>context: k8s.test.mydomain.com
+```</p>
+
+<p><code>sh
+kontemplate apply test-cluster.yaml &lt;&lt; YAML
+mySecretVar: foo-bar-12345
+YAML
+</code></p>
+
+</body>
+</html>
