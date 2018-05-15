@@ -72,6 +72,11 @@ is the same for some, but not all, clusters in a common place.
 
 This field is **optional**.
 
+#### Standard Input
+
+Additionally you may pipe YAML or JSON data via stdin which will be read as global variables
+as if you had used `import` on standard input.
+
 ### `include`
 
 The `include` field contains the actual resource sets to be included in the cluster.
@@ -102,5 +107,20 @@ include:
 ```
 
 The variable `mySecretVar` is then available as a global variable.
+
+
+### External variables via stdin
+
+Similarly you can provide extra variables with standard input.
+```yaml
+# test-cluster.yaml
+context: k8s.test.mydomain.com
+```
+
+```sh
+kontemplate apply test-cluster.yaml << YAML
+mySecretVar: foo-bar-12345
+YAML
+```
 
 [resource set documentation]: resource-sets.md

@@ -11,7 +11,11 @@ package context
 
 import (
 	"fmt"
+	"io/ioutil"
+	"os"
 	"path"
+
+	"github.com/ghodss/yaml"
 
 	"github.com/tazjin/kontemplate/util"
 )
@@ -73,6 +77,11 @@ func LoadContextFromFile(filename string) (*Context, error) {
 		return nil, contextLoadingError(filename, err)
 	}
 
+	err = c.loadStdinVariables()
+	if err != nil {
+		return nil, contextLoadingError("stdin", err)
+	}
+
 	return &c, nil
 }
 
@@ -91,6 +100,27 @@ func (ctx *Context) loadImportedVariables() error {
 	}
 
 	return nil
+}
+
+// As a bonus load additional variables from data piped to stdin as if they had been added with `import`.
+func (ctx *Context) loadStdinVariables() error {
+	stat, _ := os.Stdin.Stat()
+	if (stat.Mode() & os.ModeCharDevice) != 0 {
+		// Stdin is a TTY, skip this
+		return nil
+	}
+
+	file, err := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		return err
+	}
+	var stdinVars map[string]interface{}
+	err = yaml.Unmarshal(file, &stdinVars)
+	if err != nil {
+		return err
+	}
+	ctx.Global = *util.Merge(&ctx.Global, &stdinVars)
+	return err
 }
 
 // Correctly prepares the file paths for resource sets by inferring implicit paths and flattening resource set
