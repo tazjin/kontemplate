@@ -37,6 +37,7 @@ var (
 	// Global flags
 	includes = app.Flag("include", "Resource sets to include explicitly").Short('i').Strings()
 	excludes = app.Flag("exclude", "Resource sets to exclude explicitly").Short('e').Strings()
+	variables = app.Flag("var", "Provide variables to templates explicitly").Strings()
 
 	// Commands
 	template          = app.Command("template", "Template resource sets and print them")
@@ -186,6 +187,11 @@ func loadContextAndResources(file *string) (*context.Context, *[]templater.Rende
 	ctx, err := context.LoadContextFromFile(*file)
 	if err != nil {
 		app.Fatalf("Error loading context: %v\n", err)
+	}
+
+	err = ctx.SetVariablesFromArguments(variables)
+	if err != nil {
+		app.Fatalf("Error setting explicit variables in context: %v\n", err)
 	}
 
 	resources, err := templater.LoadAndApplyTemplates(includes, excludes, ctx)

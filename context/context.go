@@ -12,6 +12,7 @@ package context
 import (
 	"fmt"
 	"path"
+	"strings"
 
 	"github.com/tazjin/kontemplate/util"
 )
@@ -157,4 +158,24 @@ func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	// Otherwise we'd have to differentiate between file-not-found-errors (no default values specified) and other
 	// errors here.
 	return &rs.Values
+}
+
+// New variables can be defined or default values overridden with command line arguments when executing kontemplate.
+func (ctx *Context) SetVariablesFromArguments(vars *[]string) error {
+	// Resource set files might not have defined any global variables, if so we have to
+	// create that a map before potentially writing variables into it
+	if ctx.Global == nil {
+		ctx.Global = make(map[string]interface{}, len(*vars))
+	}
+
+	for _, v := range *vars {
+		varParts := strings.Split(v, "=")
+		if len(varParts) != 2 {
+			return fmt.Errorf(`invalid explicit variable provided (%s), name and value should be divided with "="`, v)
+		}
+
+		ctx.Global[varParts[0]] = varParts[1]
+	}
+
+	return nil
 }

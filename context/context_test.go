@@ -280,3 +280,25 @@ func TestExplicitSubresourcePathLoading(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestSetVariablesFromArguments(t *testing.T) {
+	vars := []string{"version=some-service-version"}
+	ctx, _ := LoadContextFromFile("testdata/default-loading.yaml")
+
+	if err := ctx.SetVariablesFromArguments(&vars); err != nil {
+		t.Error(err)
+	}
+
+	if version := ctx.Global["version"]; version != "some-service-version" {
+		t.Errorf(`Expected variable "version" to have value "some-service-version" but was "%s"`, version)
+	}
+}
+
+func TestSetInvalidVariablesFromArguments(t *testing.T) {
+	vars := []string{"version: some-service-version"}
+	ctx, _ := LoadContextFromFile("testdata/default-loading.yaml")
+
+	if err := ctx.SetVariablesFromArguments(&vars); err == nil {
+		t.Error("Expected invalid variable to return an error")
+	}
+}
