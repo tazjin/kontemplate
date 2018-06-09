@@ -1,0 +1,7 @@
+---
+apiVersion: extensions/v1beta1
+kind: ConfigMap
+metadata:
+  name: other-config
+data:
+  globalData: {{ .globalVar }}
