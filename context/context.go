@@ -88,7 +88,7 @@ func LoadContext(filename string, explicitVars *[]string) (*Context, error) {
 		return nil, contextLoadingError(filename, err)
 	}
 
-	// Merge variables (explicit > import > include >  global > default)
+	// Merge variables (explicit > import > include > global > default)
 	ctx.ResourceSets = ctx.mergeContextValues()
 
 	if err != nil {
@@ -168,7 +168,7 @@ func (ctx *Context) mergeContextValues() []ResourceSet {
 
 	for i, rs := range ctx.ResourceSets {
 		merged := loadDefaultValues(&rs, ctx)
-		merged = util.Merge(&ctx.Global, merged)
+		merged = util.Merge(merged, &ctx.Global)
 		merged = util.Merge(merged, &ctx.ImportedVars)
 		merged = util.Merge(merged, &ctx.ExplicitVars)
 		rs.Values = *merged
