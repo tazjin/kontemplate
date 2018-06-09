@@ -35,8 +35,8 @@ var (
 	app = kingpin.New("kontemplate", "simple Kubernetes resource templating")
 
 	// Global flags
-	includes = app.Flag("include", "Resource sets to include explicitly").Short('i').Strings()
-	excludes = app.Flag("exclude", "Resource sets to exclude explicitly").Short('e').Strings()
+	includes  = app.Flag("include", "Resource sets to include explicitly").Short('i').Strings()
+	excludes  = app.Flag("exclude", "Resource sets to exclude explicitly").Short('e').Strings()
 	variables = app.Flag("var", "Provide variables to templates explicitly").Strings()
 
 	// Commands
