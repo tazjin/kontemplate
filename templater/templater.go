@@ -58,19 +58,37 @@ func LoadAndApplyTemplates(include *[]string, exclude *[]string, c *context.Cont
 	return renderedResourceSets, nil
 }
 
-func processResourceSet(c *context.Context, rs *context.ResourceSet) (*RenderedResourceSet, error) {
+func processResourceSet(ctx *context.Context, rs *context.ResourceSet) (*RenderedResourceSet, error) {
 	fmt.Fprintf(os.Stderr, "Loading resources for %s\n", rs.Name)
 
-	rp := path.Join(c.BaseDir, rs.Path)
-
-	// Explicitly discard this error, which will give us an empty list of files instead.
-	// This will end up printing a warning to the user, but it won't stop the rest of the process.
-	files, _ := ioutil.ReadDir(rp)
-
-	resources, err := processFiles(c, rs, rp, files)
-
+	resourcePath := path.Join(ctx.BaseDir, rs.Path)
+	fileInfo, err := os.Stat(resourcePath)
 	if err != nil {
 		return nil, err
+	}
+
+	var files []os.FileInfo
+	var resources []RenderedResource
+
+	// Treat single-file resource paths separately from resource
+	// sets containing multiple templates
+	if fileInfo.IsDir() {
+		// Explicitly discard this error, which will give us an empty
+		// list of files instead.
+		// This will end up printing a warning to the user, but it
+		// won't stop the rest of the process.
+		files, _ = ioutil.ReadDir(resourcePath)
+		resources, err = processFiles(ctx, rs, files)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		resource, err := templateFile(ctx, rs, resourcePath)
+		if err != nil {
+			return nil, err
+		}
+
+		resources = []RenderedResource{resource}
 	}
 
 	return &RenderedResourceSet{
@@ -79,22 +97,18 @@ func processResourceSet(c *context.Context, rs *context.ResourceSet) (*RenderedR
 	}, nil
 }
 
-func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files []os.FileInfo) ([]RenderedResource, error) {
+func processFiles(ctx *context.Context, rs *context.ResourceSet, files []os.FileInfo) ([]RenderedResource, error) {
 	resources := make([]RenderedResource, 0)
 
 	for _, file := range files {
 		if !file.IsDir() && isResourceFile(file) {
-			p := path.Join(rp, file.Name())
-			o, err := templateFile(c, rs, p)
+			path := path.Join(ctx.BaseDir, rs.Path, file.Name())
+			res, err := templateFile(ctx, rs, path)
 
 			if err != nil {
 				return resources, err
 			}
 
-			res := RenderedResource{
-				Filename: file.Name(),
-				Rendered: o,
-			}
 			resources = append(resources, res)
 		}
 	}
@@ -102,22 +116,26 @@ func processFiles(c *context.Context, rs *context.ResourceSet, rp string, files 
 	return resources, nil
 }
 
-func templateFile(c *context.Context, rs *context.ResourceSet, filename string) (string, error) {
-	tpl, err := template.New(path.Base(filename)).Funcs(templateFuncs(c, rs)).Option(failOnMissingKeys).ParseFiles(filename)
+func templateFile(ctx *context.Context, rs *context.ResourceSet, filepath string) (RenderedResource, error) {
+	var resource RenderedResource
 
+	tpl, err := template.New(path.Base(filepath)).Funcs(templateFuncs(ctx, rs)).Option(failOnMissingKeys).ParseFiles(filepath)
 	if err != nil {
-		return "", fmt.Errorf("Template %s not found: %v", filename, err)
+		return resource, fmt.Errorf("Could not load template %s: %v", filepath, err)
 	}
 
 	var b bytes.Buffer
-
 	err = tpl.Execute(&b, rs.Values)
-
 	if err != nil {
-		return "", fmt.Errorf("Error while templating %s: %v", filename, err)
+		return resource, fmt.Errorf("Error while templating %s: %v", filepath, err)
 	}
 
-	return b.String(), nil
+	resource = RenderedResource{
+		Filename: path.Base(filepath),
+		Rendered: b.String(),
+	}
+
+	return resource, nil
 }
 
 // Applies the limits of explicitly included or excluded resources and returns the updated resource set.
