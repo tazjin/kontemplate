@@ -43,7 +43,7 @@ func TestLoadFlatContextFromFile(t *testing.T) {
 				Parent:  "",
 			},
 		},
-		BaseDir: "testdata",
+		BaseDir:      "testdata",
 		ImportedVars: make(map[string]interface{}, 0),
 		ExplicitVars: make(map[string]interface{}, 0),
 	}
@@ -84,14 +84,14 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 				Name: "collection/nested",
 				Path: "collection/nested",
 				Values: map[string]interface{}{
-					"lizards": "good",
+					"lizards":   "good",
 					"globalVar": "lizards",
 				},
 				Include: nil,
 				Parent:  "collection",
 			},
 		},
-		BaseDir: "testdata",
+		BaseDir:      "testdata",
 		ImportedVars: make(map[string]interface{}, 0),
 		ExplicitVars: make(map[string]interface{}, 0),
 	}
@@ -125,7 +125,7 @@ func TestSubresourceVariableInheritance(t *testing.T) {
 				Parent:  "parent",
 			},
 		},
-		BaseDir: "testdata",
+		BaseDir:      "testdata",
 		ImportedVars: make(map[string]interface{}, 0),
 		ExplicitVars: make(map[string]interface{}, 0),
 	}
@@ -157,7 +157,7 @@ func TestSubresourceVariableInheritanceOverride(t *testing.T) {
 				Parent:  "parent",
 			},
 		},
-		BaseDir: "testdata",
+		BaseDir:      "testdata",
 		ImportedVars: make(map[string]interface{}, 0),
 		ExplicitVars: make(map[string]interface{}, 0),
 	}
@@ -221,7 +221,7 @@ func TestValuesOverride(t *testing.T) {
 			"artist": "Pallida",
 			"track":  "Tractor Beam",
 		},
-		"place": "Oslo",
+		"place":     "Oslo",
 		"globalVar": "very global!",
 	}
 
@@ -260,7 +260,7 @@ func TestExplicitPathLoading(t *testing.T) {
 				Parent:  "",
 			},
 		},
-		BaseDir: "testdata",
+		BaseDir:      "testdata",
 		ImportedVars: make(map[string]interface{}, 0),
 		ExplicitVars: make(map[string]interface{}, 0),
 	}
@@ -288,7 +288,7 @@ func TestExplicitSubresourcePathLoading(t *testing.T) {
 				Values: make(map[string]interface{}, 0),
 			},
 		},
-		BaseDir: "testdata",
+		BaseDir:      "testdata",
 		ImportedVars: make(map[string]interface{}, 0),
 		ExplicitVars: make(map[string]interface{}, 0),
 	}
