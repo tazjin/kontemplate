@@ -65,7 +65,7 @@ func contextLoadingError(filename string, cause error) error {
 // Attempt to load and deserialise a Context from the specified file.
 func LoadContext(filename string, explicitVars *[]string) (*Context, error) {
 	var ctx Context
-	err := util.LoadJsonOrYaml(filename, &ctx)
+	err := util.LoadData(filename, &ctx)
 
 	if err != nil {
 		return nil, contextLoadingError(filename, err)
@@ -105,8 +105,17 @@ func (ctx *Context) loadImportedVariables() (map[string]interface{}, error) {
 	allImportedVars := make(map[string]interface{})
 
 	for _, file := range ctx.VariableImportFiles {
+		// Ensure that the filename is not merged with the baseDir if
+		// it is set to an absolute path.
+		var filePath string
+		if path.IsAbs(file) {
+			filePath = file
+		} else {
+			filePath = path.Join(ctx.BaseDir, file)
+		}
+
 		var importedVars map[string]interface{}
-		err := util.LoadJsonOrYaml(path.Join(ctx.BaseDir, file), &importedVars)
+		err := util.LoadData(filePath, &importedVars)
 
 		if err != nil {
 			return nil, err
@@ -176,7 +185,7 @@ func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	var defaultVars map[string]interface{}
 
 	for _, filename := range util.DefaultFilenames {
-		err := util.LoadJsonOrYaml(path.Join(c.BaseDir, rs.Path, filename), &defaultVars)
+		err := util.LoadData(path.Join(c.BaseDir, rs.Path, filename), &defaultVars)
 		if err == nil {
 			return util.Merge(&defaultVars, &rs.Values)
 		}
