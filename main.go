@@ -184,14 +184,9 @@ func createCommand() {
 }
 
 func loadContextAndResources(file *string) (*context.Context, *[]templater.RenderedResourceSet) {
-	ctx, err := context.LoadContextFromFile(*file)
+	ctx, err := context.LoadContext(*file, variables)
 	if err != nil {
 		app.Fatalf("Error loading context: %v\n", err)
-	}
-
-	err = ctx.SetVariablesFromArguments(variables)
-	if err != nil {
-		app.Fatalf("Error setting explicit variables in context: %v\n", err)
 	}
 
 	resources, err := templater.LoadAndApplyTemplates(includes, excludes, ctx)
