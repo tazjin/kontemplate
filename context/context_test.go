@@ -14,8 +14,10 @@ import (
 	"testing"
 )
 
+var noExplicitVars []string = make([]string, 0)
+
 func TestLoadFlatContextFromFile(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/flat-test.yaml")
+	ctx, err := LoadContext("testdata/flat-test.yaml", &noExplicitVars)
 
 	if err != nil {
 		t.Error(err)
@@ -35,12 +37,15 @@ func TestLoadFlatContextFromFile(t *testing.T) {
 					"apiPort":          float64(4567), // yep!
 					"importantFeature": true,
 					"version":          "1.0-0e6884d",
+					"globalVar":        "lizards",
 				},
 				Include: nil,
 				Parent:  "",
 			},
 		},
 		BaseDir: "testdata",
+		ImportedVars: make(map[string]interface{}, 0),
+		ExplicitVars: make(map[string]interface{}, 0),
 	}
 
 	if !reflect.DeepEqual(*ctx, expected) {
@@ -50,7 +55,7 @@ func TestLoadFlatContextFromFile(t *testing.T) {
 }
 
 func TestLoadContextWithResourceSetCollections(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/collections-test.yaml")
+	ctx, err := LoadContext("testdata/collections-test.yaml", &noExplicitVars)
 
 	if err != nil {
 		t.Error(err)
@@ -70,6 +75,7 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 					"apiPort":          float64(4567), // yep!
 					"importantFeature": true,
 					"version":          "1.0-0e6884d",
+					"globalVar":        "lizards",
 				},
 				Include: nil,
 				Parent:  "",
@@ -79,12 +85,15 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 				Path: "collection/nested",
 				Values: map[string]interface{}{
 					"lizards": "good",
+					"globalVar": "lizards",
 				},
 				Include: nil,
 				Parent:  "collection",
 			},
 		},
 		BaseDir: "testdata",
+		ImportedVars: make(map[string]interface{}, 0),
+		ExplicitVars: make(map[string]interface{}, 0),
 	}
 
 	if !reflect.DeepEqual(*ctx, expected) {
@@ -95,7 +104,7 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 }
 
 func TestSubresourceVariableInheritance(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/parent-variables.yaml")
+	ctx, err := LoadContext("testdata/parent-variables.yaml", &noExplicitVars)
 
 	if err != nil {
 		t.Error(err)
@@ -117,6 +126,8 @@ func TestSubresourceVariableInheritance(t *testing.T) {
 			},
 		},
 		BaseDir: "testdata",
+		ImportedVars: make(map[string]interface{}, 0),
+		ExplicitVars: make(map[string]interface{}, 0),
 	}
 
 	if !reflect.DeepEqual(*ctx, expected) {
@@ -126,7 +137,7 @@ func TestSubresourceVariableInheritance(t *testing.T) {
 }
 
 func TestSubresourceVariableInheritanceOverride(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/parent-variable-override.yaml")
+	ctx, err := LoadContext("testdata/parent-variable-override.yaml", &noExplicitVars)
 
 	if err != nil {
 		t.Error(err)
@@ -147,6 +158,8 @@ func TestSubresourceVariableInheritanceOverride(t *testing.T) {
 			},
 		},
 		BaseDir: "testdata",
+		ImportedVars: make(map[string]interface{}, 0),
+		ExplicitVars: make(map[string]interface{}, 0),
 	}
 
 	if !reflect.DeepEqual(*ctx, expected) {
@@ -156,7 +169,7 @@ func TestSubresourceVariableInheritanceOverride(t *testing.T) {
 }
 
 func TestDefaultValuesLoading(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/default-loading.yaml")
+	ctx, err := LoadContext("testdata/default-loading.yaml", &noExplicitVars)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -175,7 +188,7 @@ func TestDefaultValuesLoading(t *testing.T) {
 }
 
 func TestImportValuesLoading(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/import-vars-simple.yaml")
+	ctx, err := LoadContext("testdata/import-vars-simple.yaml", &noExplicitVars)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -189,14 +202,14 @@ func TestImportValuesLoading(t *testing.T) {
 		},
 	}
 
-	if !reflect.DeepEqual(ctx.Global, expected) {
-		t.Error("Expected global values after loading imports did not match!")
+	if !reflect.DeepEqual(ctx.ImportedVars, expected) {
+		t.Error("Expected imported values after loading imports did not match!")
 		t.Fail()
 	}
 }
 
-func TestImportValuesOverride(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/import-vars-override.yaml")
+func TestValuesOverride(t *testing.T) {
+	ctx, err := LoadContext("testdata/import-vars-override.yaml", &noExplicitVars)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -208,18 +221,18 @@ func TestImportValuesOverride(t *testing.T) {
 			"artist": "Pallida",
 			"track":  "Tractor Beam",
 		},
-		"place":     "Oslo",
+		"place": "Oslo",
 		"globalVar": "very global!",
 	}
 
-	if !reflect.DeepEqual(ctx.Global, expected) {
-		t.Error("Expected global values after loading imports did not match!")
+	if !reflect.DeepEqual(ctx.ResourceSets[0].Values, expected) {
+		t.Error("Expected overrides after loading imports did not match!")
 		t.Fail()
 	}
 }
 
 func TestExplicitPathLoading(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/explicit-path.yaml")
+	ctx, err := LoadContext("testdata/explicit-path.yaml", &noExplicitVars)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -248,6 +261,8 @@ func TestExplicitPathLoading(t *testing.T) {
 			},
 		},
 		BaseDir: "testdata",
+		ImportedVars: make(map[string]interface{}, 0),
+		ExplicitVars: make(map[string]interface{}, 0),
 	}
 
 	if !reflect.DeepEqual(*ctx, expected) {
@@ -257,7 +272,7 @@ func TestExplicitPathLoading(t *testing.T) {
 }
 
 func TestExplicitSubresourcePathLoading(t *testing.T) {
-	ctx, err := LoadContextFromFile("testdata/explicit-subresource-path.yaml")
+	ctx, err := LoadContext("testdata/explicit-subresource-path.yaml", &noExplicitVars)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -270,9 +285,12 @@ func TestExplicitSubresourcePathLoading(t *testing.T) {
 				Name:   "parent/child",
 				Path:   "parent-path/child-path",
 				Parent: "parent",
+				Values: make(map[string]interface{}, 0),
 			},
 		},
 		BaseDir: "testdata",
+		ImportedVars: make(map[string]interface{}, 0),
+		ExplicitVars: make(map[string]interface{}, 0),
 	}
 
 	if !reflect.DeepEqual(*ctx, expected) {
@@ -283,22 +301,18 @@ func TestExplicitSubresourcePathLoading(t *testing.T) {
 
 func TestSetVariablesFromArguments(t *testing.T) {
 	vars := []string{"version=some-service-version"}
-	ctx, _ := LoadContextFromFile("testdata/default-loading.yaml")
+	ctx, _ := LoadContext("testdata/default-loading.yaml", &vars)
 
-	if err := ctx.SetVariablesFromArguments(&vars); err != nil {
-		t.Error(err)
-	}
-
-	if version := ctx.Global["version"]; version != "some-service-version" {
+	if version := ctx.ExplicitVars["version"]; version != "some-service-version" {
 		t.Errorf(`Expected variable "version" to have value "some-service-version" but was "%s"`, version)
 	}
 }
 
 func TestSetInvalidVariablesFromArguments(t *testing.T) {
 	vars := []string{"version: some-service-version"}
-	ctx, _ := LoadContextFromFile("testdata/default-loading.yaml")
+	_, err := LoadContext("testdata/default-loading.yaml", &vars)
 
-	if err := ctx.SetVariablesFromArguments(&vars); err == nil {
+	if err == nil {
 		t.Error("Expected invalid variable to return an error")
 	}
 }

@@ -111,8 +111,6 @@ func templateFile(c *context.Context, rs *context.ResourceSet, filename string) 
 
 	var b bytes.Buffer
 
-	rs.Values = *util.Merge(&c.Global, &rs.Values)
-
 	err = tpl.Execute(&b, rs.Values)
 
 	if err != nil {

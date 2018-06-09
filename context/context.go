@@ -43,10 +43,16 @@ type Context struct {
 	Global map[string]interface{} `json:"global"`
 
 	// File names of YAML or JSON files including extra variables that should be globally accessible
-	VariableImports []string `json:"import"`
+	VariableImportFiles []string `json:"import"`
 
 	// The resource sets to include in this context
 	ResourceSets []ResourceSet `json:"include"`
+
+	// Variables imported from additional files
+	ImportedVars map[string]interface{}
+
+	// Explicitly set variables (via `--var`) that should override all others
+	ExplicitVars map[string]interface{}
 
 	// This field represents the absolute path to the context base directory and should not be manually specified.
 	BaseDir string
@@ -57,41 +63,59 @@ func contextLoadingError(filename string, cause error) error {
 }
 
 // Attempt to load and deserialise a Context from the specified file.
-func LoadContextFromFile(filename string) (*Context, error) {
-	var c Context
-	err := util.LoadJsonOrYaml(filename, &c)
+func LoadContext(filename string, explicitVars *[]string) (*Context, error) {
+	var ctx Context
+	err := util.LoadJsonOrYaml(filename, &ctx)
 
 	if err != nil {
 		return nil, contextLoadingError(filename, err)
 	}
 
-	c.ResourceSets = flattenPrepareResourceSetPaths(&c.ResourceSets)
-	c.BaseDir = path.Dir(filename)
-	c.ResourceSets = loadAllDefaultValues(&c)
+	ctx.BaseDir = path.Dir(filename)
 
-	err = c.loadImportedVariables()
+	// Prepare the resource sets by resolving parents etc.
+	ctx.ResourceSets = flattenPrepareResourceSetPaths(&ctx.ResourceSets)
+
+	// Add variables explicitly specified on the command line
+	ctx.ExplicitVars, err = loadExplicitVars(explicitVars)
+	if err != nil {
+		return nil, fmt.Errorf("Error setting explicit variables: %v\n", err)
+	}
+
+	// Add variables loaded from import files
+	ctx.ImportedVars, err = ctx.loadImportedVariables()
 	if err != nil {
 		return nil, contextLoadingError(filename, err)
 	}
 
-	return &c, nil
+	// Merge variables (explicit > import > include >  global > default)
+	ctx.ResourceSets = ctx.mergeContextValues()
+
+	if err != nil {
+		return nil, contextLoadingError(filename, err)
+	}
+
+	return &ctx, nil
 }
 
-// Kontemplate supports specifying additional variable files with the `import` keyword. This function loads those
-// variable files and merges them together with the context's other global variables.
-func (ctx *Context) loadImportedVariables() error {
-	for _, file := range ctx.VariableImports {
+// Kontemplate supports specifying additional variable files with the
+// `import` keyword. This function loads those variable files and
+// merges them together with the context's other global variables.
+func (ctx *Context) loadImportedVariables() (map[string]interface{}, error) {
+	allImportedVars := make(map[string]interface{})
+
+	for _, file := range ctx.VariableImportFiles {
 		var importedVars map[string]interface{}
 		err := util.LoadJsonOrYaml(path.Join(ctx.BaseDir, file), &importedVars)
 
 		if err != nil {
-			return err
+			return nil, err
 		}
 
-		ctx.Global = *util.Merge(&ctx.Global, &importedVars)
+		allImportedVars = *util.Merge(&allImportedVars, &importedVars)
 	}
 
-	return nil
+	return allImportedVars, nil
 }
 
 // Correctly prepares the file paths for resource sets by inferring implicit paths and flattening resource set
@@ -128,11 +152,16 @@ func flattenPrepareResourceSetPaths(rs *[]ResourceSet) []ResourceSet {
 	return flattened
 }
 
-func loadAllDefaultValues(c *Context) []ResourceSet {
-	updated := make([]ResourceSet, len(c.ResourceSets))
+// Merges the context and resource set variables according in the
+// desired precedence order.
+func (ctx *Context) mergeContextValues() []ResourceSet {
+	updated := make([]ResourceSet, len(ctx.ResourceSets))
 
-	for i, rs := range c.ResourceSets {
-		merged := loadDefaultValues(&rs, c)
+	for i, rs := range ctx.ResourceSets {
+		merged := loadDefaultValues(&rs, ctx)
+		merged = util.Merge(&ctx.Global, merged)
+		merged = util.Merge(merged, &ctx.ImportedVars)
+		merged = util.Merge(merged, &ctx.ExplicitVars)
 		rs.Values = *merged
 		updated[i] = rs
 	}
@@ -160,22 +189,19 @@ func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	return &rs.Values
 }
 
-// New variables can be defined or default values overridden with command line arguments when executing kontemplate.
-func (ctx *Context) SetVariablesFromArguments(vars *[]string) error {
-	// Resource set files might not have defined any global variables, if so we have to
-	// create that a map before potentially writing variables into it
-	if ctx.Global == nil {
-		ctx.Global = make(map[string]interface{}, len(*vars))
-	}
+// Prepares the variables specified explicitly via `--var` when
+// executing kontemplate for adding to the context.
+func loadExplicitVars(vars *[]string) (map[string]interface{}, error) {
+	explicitVars := make(map[string]interface{}, len(*vars))
 
 	for _, v := range *vars {
 		varParts := strings.Split(v, "=")
 		if len(varParts) != 2 {
-			return fmt.Errorf(`invalid explicit variable provided (%s), name and value should be divided with "="`, v)
+			return nil, fmt.Errorf(`invalid explicit variable provided (%s), name and value should be separated with "="`, v)
 		}
 
-		ctx.Global[varParts[0]] = varParts[1]
+		explicitVars[varParts[0]] = varParts[1]
 	}
 
-	return nil
+	return explicitVars, nil
 }

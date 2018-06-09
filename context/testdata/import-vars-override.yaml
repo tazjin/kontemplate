@@ -6,4 +6,5 @@ global:
 import:
   - test-vars.yaml
   - test-vars-override.yaml
-include: []
+include:
+  - name: test-set
