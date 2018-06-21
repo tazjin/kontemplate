@@ -204,7 +204,7 @@ func loadExplicitVars(vars *[]string) (map[string]interface{}, error) {
 	explicitVars := make(map[string]interface{}, len(*vars))
 
 	for _, v := range *vars {
-		varParts := strings.Split(v, "=")
+		varParts := strings.SplitN(v, "=", 2)
 		if len(varParts) != 2 {
 			return nil, fmt.Errorf(`invalid explicit variable provided (%s), name and value should be separated with "="`, v)
 		}
