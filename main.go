@@ -35,9 +35,10 @@ var (
 	app = kingpin.New("kontemplate", "simple Kubernetes resource templating")
 
 	// Global flags
-	includes  = app.Flag("include", "Resource sets to include explicitly").Short('i').Strings()
-	excludes  = app.Flag("exclude", "Resource sets to exclude explicitly").Short('e').Strings()
-	variables = app.Flag("var", "Provide variables to templates explicitly").Strings()
+	includes   = app.Flag("include", "Resource sets to include explicitly").Short('i').Strings()
+	excludes   = app.Flag("exclude", "Resource sets to exclude explicitly").Short('e').Strings()
+	variables  = app.Flag("var", "Provide variables to templates explicitly").Strings()
+	kubectlBin = app.Flag("kubectl", "Path to the kubectl binary (default 'kubectl')").Default("kubectl").String()
 
 	// Commands
 	template          = app.Command("template", "Template resource sets and print them")
@@ -206,7 +207,7 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 			continue
 		}
 
-		kubectl := exec.Command("kubectl", args...)
+		kubectl := exec.Command(*kubectlBin, args...)
 
 		stdin, err := kubectl.StdinPipe()
 		if err != nil {
