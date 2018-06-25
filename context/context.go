@@ -167,8 +167,8 @@ func (ctx *Context) mergeContextValues() []ResourceSet {
 	updated := make([]ResourceSet, len(ctx.ResourceSets))
 
 	for i, rs := range ctx.ResourceSets {
-		merged := loadDefaultValues(&rs, ctx)
-		merged = util.Merge(merged, &ctx.Global)
+		defaultValues := loadDefaultValues(&rs, ctx)
+		merged := util.Merge(&ctx.Global, defaultValues)
 		merged = util.Merge(merged, &ctx.ImportedVars)
 		merged = util.Merge(merged, &ctx.ExplicitVars)
 		rs.Values = *merged
