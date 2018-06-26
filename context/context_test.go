@@ -293,3 +293,25 @@ func TestSetInvalidVariablesFromArguments(t *testing.T) {
 		t.Error("Expected invalid variable to return an error")
 	}
 }
+
+// This test ensures that variables are merged in the correct order.
+// Please consult the test data in `testdata/merging`.
+func TestValueMergePrecedence(t *testing.T) {
+	cliVars:= []string{"cliVar=cliVar"}
+	ctx, _ := LoadContext("testdata/merging/context.yaml", &cliVars)
+
+	expected := map[string]interface{}{
+		"defaultVar": "defaultVar",
+		"importVar": "importVar",
+		"globalVar": "globalVar",
+		"includeVar": "includeVar",
+		"cliVar": "cliVar",
+	}
+
+	result := ctx.ResourceSets[0].Values
+
+	if !reflect.DeepEqual(expected, result) {
+		t.Errorf("Merged values did not match expected result: \n%v", result)
+		t.Fail()
+	}
+}
