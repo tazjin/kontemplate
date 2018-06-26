@@ -88,7 +88,9 @@ func LoadContext(filename string, explicitVars *[]string) (*Context, error) {
 		return nil, contextLoadingError(filename, err)
 	}
 
-	// Merge variables (explicit > import > include > global > default)
+	// Merge variables defined at different levels. The
+	// `mergeContextValues` function is documented with the merge
+	// hierarchy.
 	ctx.ResourceSets = ctx.mergeContextValues()
 
 	if err != nil {
@@ -163,14 +165,50 @@ func flattenPrepareResourceSetPaths(rs *[]ResourceSet) []ResourceSet {
 
 // Merges the context and resource set variables according in the
 // desired precedence order.
+//
+// For now the reasoning behind the merge order is from least specific
+// in relation to the cluster configuration, which means that the
+// precedence is (in ascending order):
+//
+// 1. Default values in resource sets.
+// 2. Values imported from files (via `import:`)
+// 3. Global values in a cluster configuration
+// 4. Values set in a resource set's `include`-section
+// 5. Explicit values set on the CLI (`--var`)
+//
+// For a discussion on the reasoning behind this order, please consult
+// https://github.com/tazjin/kontemplate/issues/142
 func (ctx *Context) mergeContextValues() []ResourceSet {
 	updated := make([]ResourceSet, len(ctx.ResourceSets))
 
+	// Merging has to happen separately for every individual
+	// resource set to make use of the default values:
 	for i, rs := range ctx.ResourceSets {
-		merged := loadDefaultValues(&rs, ctx)
+		// Begin by loading default values from the resource
+		// sets configuration.
+		//
+		// Resource sets are used across different cluster
+		// contexts and the default values in them have the
+		// lowest precedence.
+		defaultValues := loadDefaultValues(&rs, ctx)
+
+		// Continue by merging default values with values
+		// imported from external files. Those values are also
+		// used across cluster contexts, but have higher
+		// precedence than defaults.
+		merged := util.Merge(defaultValues, &ctx.ImportedVars)
+
+		// Merge global values defined in the cluster context:
 		merged = util.Merge(merged, &ctx.Global)
-		merged = util.Merge(merged, &ctx.ImportedVars)
+
+		// Merge values configured in the resource set's
+		// `include` section:
+		merged = util.Merge(merged, &rs.Values)
+
+		// Merge values defined explicitly on the CLI:
 		merged = util.Merge(merged, &ctx.ExplicitVars)
+
+		// Continue with the newly merged resource set:
 		rs.Values = *merged
 		updated[i] = rs
 	}
@@ -178,23 +216,26 @@ func (ctx *Context) mergeContextValues() []ResourceSet {
 	return updated
 }
 
-// Loads and merges default values for a resource set collection from path/to/set/default.{json|yaml}.
-// YAML takes precedence over JSON.
-// Default values in resource set collections have the lowest priority possible.
+// Loads default values for a resource set collection from
+// path/to/set/default.{json|yaml}.
 func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	var defaultVars map[string]interface{}
 
 	for _, filename := range util.DefaultFilenames {
 		err := util.LoadData(path.Join(c.BaseDir, rs.Path, filename), &defaultVars)
 		if err == nil {
-			return util.Merge(&defaultVars, &rs.Values)
+			return &defaultVars
 		}
 	}
 
-	// The actual error is not inspected here. The reasoning for this is that in case of serious problems (e.g.
-	// permission issues with the folder / folder not existing) failure will occur a bit later anyways.
-	// Otherwise we'd have to differentiate between file-not-found-errors (no default values specified) and other
-	// errors here.
+	// The actual error is not inspected here. The reasoning for
+	// this is that in case of serious problems (e.g. permission
+	// issues with the folder / folder not existing) failure will
+	// occur a bit later anyways.
+	//
+	// Otherwise we'd have to differentiate between
+	// file-not-found-errors (no default values specified) and
+	// other errors here.
 	return &rs.Values
 }
 
