@@ -208,29 +208,6 @@ func TestImportValuesLoading(t *testing.T) {
 	}
 }
 
-func TestValuesOverride(t *testing.T) {
-	ctx, err := LoadContext("testdata/import-vars-override.yaml", &noExplicitVars)
-	if err != nil {
-		t.Error(err)
-		t.Fail()
-	}
-
-	expected := map[string]interface{}{
-		"override": float64(3),
-		"music": map[string]interface{}{
-			"artist": "Pallida",
-			"track":  "Tractor Beam",
-		},
-		"place":     "Oslo",
-		"globalVar": "very global!",
-	}
-
-	if !reflect.DeepEqual(ctx.ResourceSets[0].Values, expected) {
-		t.Error("Expected overrides after loading imports did not match!")
-		t.Fail()
-	}
-}
-
 func TestExplicitPathLoading(t *testing.T) {
 	ctx, err := LoadContext("testdata/explicit-path.yaml", &noExplicitVars)
 	if err != nil {
