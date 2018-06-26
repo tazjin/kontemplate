@@ -1,0 +1,4 @@
+importVar: importVar
+globalVar: should be overridden (import)
+includeVar: should be overridden (import)
+cliVar: should be overridden (import)

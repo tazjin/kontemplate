@@ -1,0 +1,5 @@
+defaultVar: {{ .defaultVar }}
+importVar: {{ .importVar }}
+globalVar: {{ .globalVar }}
+includeVar: {{ .includeVar }}
+cliVar: {{ .cliVar }}
