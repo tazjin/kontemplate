@@ -203,7 +203,13 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 
 		return string(data), nil
 	}
+	m["default"] = func(defaultVal interface{}, varName string) interface{} {
+		if val, ok := rs.Values[varName]; ok {
+			return val
+		}
 
+		return defaultVal
+	}
 	return m
 }
 
