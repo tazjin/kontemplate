@@ -162,3 +162,20 @@ func TestFailOnMissingKeys(t *testing.T) {
 		t.Errorf("Templating failed with unexpected error: %v\n", err)
 	}
 }
+
+func TestDefaultTemplateFunction(t *testing.T) {
+	ctx := context.Context{}
+	resourceSet := context.ResourceSet{}
+
+	res, err := templateFile(&ctx, &resourceSet, "testdata/test-default.txt")
+
+	if err != nil {
+		t.Errorf("Templating with default values should have succeeded.\n")
+		t.Fail()
+	}
+
+	if res.Rendered != "defaultValue\n" {
+		t.Error("Result does not contain expected rendered default value.")
+		t.Fail()
+	}
+}
