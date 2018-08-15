@@ -110,6 +110,12 @@ brew tap tazjin/kontemplate https://github.com/tazjin/kontemplate
 brew install kontemplate
 ```
 
+### NixOS
+
+Kontemplate has been included in [NixOS](https://nixos.org/) since version 17.09.
+
+It is available as `kontemplate` from the default Nix package set.
+
 ### Arch Linux
 
 An [AUR package][] is available for Arch Linux and other `pacman`-based distributions.
