@@ -35,6 +35,7 @@ type RenderedResource struct {
 type RenderedResourceSet struct {
 	Name      string
 	Resources []RenderedResource
+	Args      []string
 }
 
 func LoadAndApplyTemplates(include *[]string, exclude *[]string, c *context.Context) ([]RenderedResourceSet, error) {
@@ -94,6 +95,7 @@ func processResourceSet(ctx *context.Context, rs *context.ResourceSet) (*Rendere
 	return &RenderedResourceSet{
 		Name:      rs.Name,
 		Resources: resources,
+		Args:      rs.Args,
 	}, nil
 }
 

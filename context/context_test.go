@@ -54,6 +54,42 @@ func TestLoadFlatContextFromFile(t *testing.T) {
 	}
 }
 
+func TestLoadContextWithArgs(t *testing.T) {
+	ctx, err := LoadContext("testdata/flat-with-args-test.yaml", &noExplicitVars)
+
+	if err != nil {
+		t.Error(err)
+		t.Fail()
+	}
+
+	expected := Context{
+		Name: "k8s.prod.mydomain.com",
+		ResourceSets: []ResourceSet{
+			{
+				Name:   "some-api",
+				Path:   "some-api",
+				Values: make(map[string]interface{}, 0),
+				Args: []string{
+					"--as=some-user",
+					"--as-group=hello:world",
+					"--as-banana",
+					"true",
+				},
+				Include: nil,
+				Parent:  "",
+			},
+		},
+		BaseDir:      "testdata",
+		ImportedVars: make(map[string]interface{}, 0),
+		ExplicitVars: make(map[string]interface{}, 0),
+	}
+
+	if !reflect.DeepEqual(*ctx, expected) {
+		t.Error("Loaded context and expected context did not match")
+		t.Fail()
+	}
+}
+
 func TestLoadContextWithResourceSetCollections(t *testing.T) {
 	ctx, err := LoadContext("testdata/collections-test.yaml", &noExplicitVars)
 

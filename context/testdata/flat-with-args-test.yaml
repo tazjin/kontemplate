@@ -1,0 +1,9 @@
+---
+context: k8s.prod.mydomain.com
+include:
+  - name: some-api
+    args:
+      - --as=some-user
+      - --as-group=hello:world
+      - --as-banana
+      - "true"
