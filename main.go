@@ -199,7 +199,7 @@ func loadContextAndResources(file *string) (*context.Context, *[]templater.Rende
 }
 
 func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resourceSets *[]templater.RenderedResourceSet) error {
-	args := append(*kubectlArgs, fmt.Sprintf("--context=%s", c.Name))
+	argsWithContext := append(*kubectlArgs, fmt.Sprintf("--context=%s", c.Name))
 
 	for _, rs := range *resourceSets {
 		if len(rs.Resources) == 0 {
@@ -207,7 +207,9 @@ func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resource
 			continue
 		}
 
-		kubectl := exec.Command(*kubectlBin, args...)
+		argsWithResourceSetArgs := append(argsWithContext, rs.Args...)
+
+		kubectl := exec.Command(*kubectlBin, argsWithResourceSetArgs...)
 
 		stdin, err := kubectl.StdinPipe()
 		if err != nil {
