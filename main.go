@@ -35,10 +35,11 @@ var (
 	app = kingpin.New("kontemplate", "simple Kubernetes resource templating")
 
 	// Global flags
-	includes   = app.Flag("include", "Resource sets to include explicitly").Short('i').Strings()
-	excludes   = app.Flag("exclude", "Resource sets to exclude explicitly").Short('e').Strings()
-	variables  = app.Flag("var", "Provide variables to templates explicitly").Strings()
-	kubectlBin = app.Flag("kubectl", "Path to the kubectl binary (default 'kubectl')").Default("kubectl").String()
+	includes         = app.Flag("include", "Resource sets to include explicitly").Short('i').Strings()
+	excludes         = app.Flag("exclude", "Resource sets to exclude explicitly").Short('e').Strings()
+	variables        = app.Flag("var", "Provide variables to templates explicitly").Strings()
+	kubectlBin       = app.Flag("kubectl", "Path to the kubectl binary (default 'kubectl')").Default("kubectl").String()
+	kubectlNamespace = app.Flag("namespace", "Kubernetes namespace passed to kubectl command").Short('n').Strings()
 
 	// Commands
 	template          = app.Command("template", "Template resource sets and print them")
@@ -199,8 +200,12 @@ func loadContextAndResources(file *string) (*context.Context, *[]templater.Rende
 }
 
 func runKubectlWithResources(c *context.Context, kubectlArgs *[]string, resourceSets *[]templater.RenderedResourceSet) error {
+
 	args := append(*kubectlArgs, fmt.Sprintf("--context=%s", c.Name))
 
+	if kubectlNamespace != nil && len(*kubectlNamespace) > 0 {
+		args = append(args, fmt.Sprintf("--namespace=%s", (*kubectlNamespace)[0]))
+	}
 	for _, rs := range *resourceSets {
 		if len(rs.Resources) == 0 {
 			fmt.Fprintf(os.Stderr, "Warning: Resource set '%s' contains no valid templates\n", rs.Name)
