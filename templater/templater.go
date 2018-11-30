@@ -23,6 +23,7 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/util"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const failOnMissingKeys string = "missingkey=error"
@@ -184,6 +185,15 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 	m["json"] = func(data interface{}) string {
 		b, _ := json.Marshal(data)
 		return string(b)
+	}
+
+	m["toYaml"] = func(v interface{}) string {
+		data, err := yaml.Marshal(v)
+		if err != nil {
+			// Swallow errors inside of a template.
+			return ""
+		}
+		return string(data)
 	}
 	m["passLookup"] = GetFromPass
 	m["gitHEAD"] = func() (string, error) {
