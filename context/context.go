@@ -33,6 +33,9 @@ type ResourceSet struct {
 
 	// Parent resource set for flattened resource sets. Should not be manually specified.
 	Parent string
+
+	// The template to be include to this resourceSet before renedering
+	TemplateHelper string `json:"helper"`
 }
 
 type Context struct {
@@ -41,6 +44,9 @@ type Context struct {
 
 	// Global variables that should be accessible by all resource sets
 	Global map[string]interface{} `json:"global"`
+
+	// The template to be include to in every resourceSet before renedering
+	GlobalTemplateHelper string `json:"globalHelper"`
 
 	// File names of YAML or JSON files including extra variables that should be globally accessible
 	VariableImportFiles []string `json:"import"`
@@ -132,7 +138,7 @@ func (ctx *Context) loadImportedVariables() (map[string]interface{}, error) {
 // Correctly prepares the file paths for resource sets by inferring implicit paths and flattening resource set
 // collections, i.e. resource sets that themselves have an additional 'include' field set.
 // Those will be regarded as a short-hand for including multiple resource sets from a subfolder.
-// See https://github.com/tazjin/kontemplate/issues/9 for more information.
+// See https://github.com/mrmm/kontemplate/issues/9 for more information.
 func flattenPrepareResourceSetPaths(rs *[]ResourceSet) []ResourceSet {
 	flattened := make([]ResourceSet, 0)
 
@@ -177,7 +183,7 @@ func flattenPrepareResourceSetPaths(rs *[]ResourceSet) []ResourceSet {
 // 5. Explicit values set on the CLI (`--var`)
 //
 // For a discussion on the reasoning behind this order, please consult
-// https://github.com/tazjin/kontemplate/issues/142
+// https://github.com/mrmm/kontemplate/issues/142
 func (ctx *Context) mergeContextValues() []ResourceSet {
 	updated := make([]ResourceSet, len(ctx.ResourceSets))
 

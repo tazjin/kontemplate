@@ -23,6 +23,7 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/util"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const failOnMissingKeys string = "missingkey=error"
@@ -124,6 +125,22 @@ func templateFile(ctx *context.Context, rs *context.ResourceSet, filepath string
 		return resource, fmt.Errorf("Could not load template %s: %v", filepath, err)
 	}
 
+	// lets include global template helper
+	if ctx.GlobalTemplateHelper != "" {
+		tpl, err = tpl.Funcs(templateFuncs(ctx, rs)).Option(failOnMissingKeys).ParseFiles(ctx.GlobalTemplateHelper)
+		if err != nil {
+			return resource, fmt.Errorf("Could not load template %s: %v", ctx.GlobalTemplateHelper, err)
+		}
+	}
+
+	// lets include resourceSet template helper
+	if rs.TemplateHelper != "" {
+		tpl, err = tpl.Funcs(templateFuncs(ctx, rs)).Option(failOnMissingKeys).ParseFiles(rs.TemplateHelper)
+		if err != nil {
+			return resource, fmt.Errorf("Could not load template %s: %v", rs.TemplateHelper, err)
+		}
+	}
+
 	var b bytes.Buffer
 	err = tpl.Execute(&b, rs.Values)
 	if err != nil {
@@ -184,6 +201,15 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 	m["json"] = func(data interface{}) string {
 		b, _ := json.Marshal(data)
 		return string(b)
+	}
+
+	m["toYaml"] = func(v interface{}) string {
+		data, err := yaml.Marshal(v)
+		if err != nil {
+			// Swallow errors inside of a template.
+			return ""
+		}
+		return string(data)
 	}
 	m["passLookup"] = GetFromPass
 	m["gitHEAD"] = func() (string, error) {
