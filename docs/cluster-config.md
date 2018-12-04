@@ -14,6 +14,7 @@ global:
   defaultReplicas: 2
 import:
   - test-secrets.yaml
+globalHelper: helper.tpl.yaml
 include:
   - name: gateway
     path: tools/nginx
@@ -40,6 +41,7 @@ include:
         - [`global`](#global)
         - [`import`](#import)
         - [`include`](#include)
+        - [`globalHelper`](#globalHelper)
     - [External variables](#external-variables)
 
 <!-- markdown-toc end -->
@@ -79,6 +81,15 @@ The `include` field contains the actual resource sets to be included in the clus
 Information about the structure of resource sets can be found in the [resource set documentation][].
 
 This field is **required**.
+
+### `globalHelper`
+
+The `globalHelper` field specifies additional templates to load in all ResourceSets when rendering the final manifest.
+
+This fields allow you to `define` named golang template and include them with `template "templateName"`
+function.
+
+This field is **optional**.
 
 ## External variables
 

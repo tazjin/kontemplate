@@ -17,6 +17,7 @@ Technically a resource set is simply a folder with a few YAML and/or JSON templa
         - [`path`](#path)
         - [`values`](#values)
         - [`include`](#include)
+        - [`helper`](#helper)
     - [Multiple includes](#multiple-includes)
     - [Nesting resource sets](#nesting-resource-sets)
         - [Caveats](#caveats)
@@ -91,6 +92,16 @@ merged in the same way.
 
 This makes it easy to organise different resource sets as "groups" to include / exclude them collectively
 during runs.
+
+This field is **optional**.
+
+### `helper`
+
+The `helper` field specifies additional templates to load when rendering the final ResourceSet template
+file.
+
+This fields allow you to `define` named golang template and include them with `template "templateName"`
+function.
 
 This field is **optional**.
 
