@@ -193,7 +193,7 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 		data, err := yaml.Marshal(v)
 		if err != nil {
 			// Swallow errors inside of a template.
-			return ""
+			return "", err
 		}
 		return string(data)
 	}
