@@ -28,6 +28,9 @@ type ResourceSet struct {
 	// Values to include when interpolating resources from this resource set.
 	Values map[string]interface{} `json:"values"`
 
+	// Args to pass on to kubectl for this resource set.
+	Args []string `json:"args"`
+
 	// Nested resource sets to include
 	Include []ResourceSet `json:"include"`
 

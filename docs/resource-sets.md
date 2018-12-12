@@ -16,6 +16,7 @@ Technically a resource set is simply a folder with a few YAML and/or JSON templa
         - [`name`](#name)
         - [`path`](#path)
         - [`values`](#values)
+        - [`args`](#args)
         - [`include`](#include)
         - [`helper`](#helper)
     - [Multiple includes](#multiple-includes)
@@ -79,6 +80,12 @@ This field is **optional**.
 ### `values`
 
 The `values` field specifies key/values pairs of variables that should be available during templating.
+
+This field is **optional**.
+
+### `args`
+
+The `args` field specifies a list of arguments that should be passed to `kubectl`.
 
 This field is **optional**.
 
