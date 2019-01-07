@@ -188,6 +188,14 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 		return string(b)
 	}
 	m["passLookup"] = GetFromPass
+	m["timestamp"] = func() (string, error) {
+		out, err := exec.Command("date", "+%s").Output()
+		if err != nil {
+			return "", err
+		}
+		output := strings.TrimSpace(string(out))
+		return output, nil
+	}
 	m["gitHEAD"] = func() (string, error) {
 		out, err := exec.Command("git", "-C", c.BaseDir, "rev-parse", "HEAD").Output()
 		if err != nil {

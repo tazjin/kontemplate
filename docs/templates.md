@@ -79,6 +79,7 @@ available in kontemplate, as well as three custom functions:
 * `passLookup`: Looks up the supplied key in [pass][].
 * `insertFile`: Insert the contents of the given file in the resource
   set folder as a string.
+* `timestamp`: Returns the current Unix time.
 
 ## Examples:
 
@@ -100,6 +101,9 @@ certKeyPath: my-website/cert-key
 
 {{ gitHEAD }}
 -> Returns the Git commit hash at HEAD.
+
+{{ timestamp }}
+-> Returns Unix time.
 ```
 
 ## Conditionals & ranges
