@@ -13,8 +13,8 @@
 let pkgs = import ((import <nixpkgs> {}).fetchFromGitHub {
   owner  = "NixOS";
   repo   = "nixpkgs";
-  rev    = "1bc5bf4beb759e563ffc7a8a3067f10a00b45a7d";
-  sha256 = "00gd96p7yz3rgpjjkizp397y2syfc272yvwxqixbjd1qdshbizmj";
+  rev    = "50f41ea2fcf86def32799f75577a4fe5cfd1132e";
+  sha256 = "1q0bxl5nxx1kabqvyzkdw91c5dnwpi2rwsgs5jdmnj7f0qqgdxh8";
 }) {};
 in with pkgs; buildGoPackage rec {
   name = "kontemplate-${version}";
