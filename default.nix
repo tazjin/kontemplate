@@ -18,6 +18,7 @@ with pkgs; buildGoPackage rec {
   src = ./.;
   goPackagePath = "github.com/tazjin/kontemplate";
   goDeps = ./deps.nix;
+  buildInputs = [ parallel ];
 
   # Enable checks and configure check-phase to include vet:
   doCheck = true;
