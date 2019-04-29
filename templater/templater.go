@@ -205,6 +205,14 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 
 		return string(data), nil
 	}
+	m["insertTemplate"] = func(file string) (string, error) {
+		data, err := templateFile(c, rs, path.Join(rs.Path, file))
+		if err != nil {
+			return "", err
+		}
+
+		return data.Rendered, nil
+	}
 	m["default"] = func(defaultVal interface{}, varName string) interface{} {
 		if val, ok := rs.Values[varName]; ok {
 			return val
