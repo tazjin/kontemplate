@@ -17,24 +17,26 @@ of Deployments and other resource types when `ConfigMap` or `Secret` objects
 are updated.
 
 It is possible to make use of annotations and templating functions in
-Kontemplate to force updates to these resources anyways (assuming that the
-`ConfigMap` or `Secret` contains interpolated variables).
+Kontemplate to force updates to these resources anyways.
  
 For example:
 
 ```yaml
-# A ConfigMap that contains some data structure in JSON format
+# A ConfigMap that contains some configuration for your app
 ---
 kind: ConfigMap
 metadata:
   name: app-config
 data:
-  configFile: {{ .appConfig | json }}
+  app.conf: |
+    name: {{ .appName }}
+    foo: bar
 ```
 
-Now whenever the `appConfig` variable changes we would like to update the
-`Deployment` making use of it, too. We can do this by adding a hash of the
-configuration to the annotations of the created `Pod` objects:
+Now whenever the `appName` variable changes or we make an edit to the
+`ConfigMap` we would like to update the `Deployment` making use of it, too. We
+can do this by adding a hash of the parsed template to the annotations of the
+created `Pod` objects:
 
 ```yaml
 
@@ -46,7 +48,7 @@ spec:
   template:
     metadata:
       annotations:
-        configHash: {{ .appConfig | json | sha256sum }}
+        configHash: {{ insertTemplate "app-config.yaml" | sha256sum }}
     spec:
       containers:
         - name: app
@@ -60,9 +62,9 @@ spec:
             name: app-config
 ```
 
-Now if the `ConfigMap` object appears first in the resource files, `kubectl`
-will apply the resources sequentially and the updated annotation will cause
-a rolling update of all relevant pods.
+Now any change to the `ConfigMap` - either by directly editing the yaml file or
+via a changed template variable - will cause the annotation to change,
+triggering a rolling update of all relevant pods.
 
 ## direnv & pass
 
