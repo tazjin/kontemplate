@@ -179,3 +179,27 @@ func TestDefaultTemplateFunction(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestInsertTemplateFunction(t *testing.T) {
+	ctx := context.Context{}
+	resourceSet := context.ResourceSet{
+		Path: "testdata",
+		Values: map[string]interface{}{
+			"testName":        "TestInsertTemplateFunction",
+		},
+	}
+
+	res, err := templateFile(&ctx, &resourceSet, "testdata/test-insertTemplate.txt")
+
+	if err != nil {
+		t.Error(err)
+		t.Errorf("Templating with an insertTemplate call should have succeeded.\n")
+		t.Fail()
+	}
+
+	if res.Rendered != "Inserting \"Template for test TestInsertTemplateFunction\".\n" {
+		t.Error("Result does not contain expected rendered template value.")
+		t.Error(res.Rendered)
+		t.Fail()
+	}
+}
