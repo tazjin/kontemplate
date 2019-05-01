@@ -23,7 +23,9 @@ with pkgs; buildGoPackage rec {
   # Enable checks and configure check-phase to include vet:
   doCheck = true;
   preCheck = ''
-    getGoDirs "" | parallel -j $NIX_BUILD_CORES buildGoDir vet
+    for pkg in $(getGoDirs ""); do
+      buildGoDir vet "$pkg"
+    done
   '';
 
   meta = with lib; {
