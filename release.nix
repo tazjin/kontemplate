@@ -36,6 +36,7 @@ in with pkgs; buildGoPackage rec {
   buildInputs = [ git ];
   buildPhase = ''
     cd go/src/${goPackagePath}
+    patchShebangs build-release.sh
     ./build-release.sh build
   '';
 
