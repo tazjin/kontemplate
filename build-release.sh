@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ueo pipefail
 
-# Copyright (C) 2016-2017  Vincent Ambo <mail@tazj.in>
+# Copyright (C) 2016-2019  Vincent Ambo <mail@tazj.in>
 #
 # This file is part of Kontemplate.
 #

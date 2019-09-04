@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2018  Vincent Ambo <mail@tazj.in>
+# Copyright (C) 2016-2019  Vincent Ambo <mail@tazj.in>
 #
 # This file is part of Kontemplate.
 #
