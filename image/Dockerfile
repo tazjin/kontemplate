@@ -1,11 +1,11 @@
-FROM alpine:3.8
+FROM alpine:3.10
 
 ADD hashes /root/hashes
-ADD https://storage.googleapis.com/kubernetes-release/release/v1.13.2/bin/linux/amd64/kubectl /usr/bin/kubectl
+ADD https://storage.googleapis.com/kubernetes-release/release/v1.15.3/bin/linux/amd64/kubectl /usr/bin/kubectl
 ADD https://github.com/tazjin/kontemplate/releases/download/v1.7.0/kontemplate-1.7.0-511ae92-linux-amd64.tar.gz /tmp/kontemplate.tar.gz
 
-# Pass release version is 1.7.1
-ADD https://raw.githubusercontent.com/zx2c4/password-store/38ec1c72e29c872ec0cdde82f75490640d4019bf/src/password-store.sh /usr/bin/pass
+# Pass release version is 1.7.3
+ADD https://raw.githubusercontent.com/zx2c4/password-store/74fdfb5022f317ad48d449e29543710bdad1afda/src/password-store.sh /usr/bin/pass
 
 RUN sha256sum -c /root/hashes && \
     apk add -U bash tree gnupg git && \
