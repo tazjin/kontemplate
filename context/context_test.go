@@ -32,7 +32,7 @@ func TestLoadFlatContextFromFile(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "some-api",
-				Path: "some-api",
+				Path: "testdata/some-api",
 				Values: map[string]interface{}{
 					"apiPort":          float64(4567), // yep!
 					"importantFeature": true,
@@ -67,7 +67,7 @@ func TestLoadContextWithArgs(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name:   "some-api",
-				Path:   "some-api",
+				Path:   "testdata/some-api",
 				Values: make(map[string]interface{}, 0),
 				Args: []string{
 					"--as=some-user",
@@ -106,7 +106,7 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "some-api",
-				Path: "some-api",
+				Path: "testdata/some-api",
 				Values: map[string]interface{}{
 					"apiPort":          float64(4567), // yep!
 					"importantFeature": true,
@@ -118,7 +118,7 @@ func TestLoadContextWithResourceSetCollections(t *testing.T) {
 			},
 			{
 				Name: "collection/nested",
-				Path: "collection/nested",
+				Path: "testdata/collection/nested",
 				Values: map[string]interface{}{
 					"lizards":   "good",
 					"globalVar": "lizards",
@@ -152,7 +152,7 @@ func TestSubresourceVariableInheritance(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "parent/child",
-				Path: "parent/child",
+				Path: "testdata/parent/child",
 				Values: map[string]interface{}{
 					"foo": "bar",
 					"bar": "baz",
@@ -185,7 +185,7 @@ func TestSubresourceVariableInheritanceOverride(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "parent/child",
-				Path: "parent/child",
+				Path: "testdata/parent/child",
 				Values: map[string]interface{}{
 					"foo": "newvalue",
 				},
@@ -256,7 +256,7 @@ func TestExplicitPathLoading(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name: "some-api-europe",
-				Path: "some-api",
+				Path: "testdata/some-api",
 				Values: map[string]interface{}{
 					"location": "europe",
 				},
@@ -265,7 +265,7 @@ func TestExplicitPathLoading(t *testing.T) {
 			},
 			{
 				Name: "some-api-asia",
-				Path: "some-api",
+				Path: "testdata/some-api",
 				Values: map[string]interface{}{
 					"location": "asia",
 				},
@@ -296,7 +296,7 @@ func TestExplicitSubresourcePathLoading(t *testing.T) {
 		ResourceSets: []ResourceSet{
 			{
 				Name:   "parent/child",
-				Path:   "parent-path/child-path",
+				Path:   "testdata/parent-path/child-path",
 				Parent: "parent",
 				Values: make(map[string]interface{}, 0),
 			},
