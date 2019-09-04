@@ -1,4 +1,4 @@
-// Copyright (C) 2016-2017  Vincent Ambo <mail@tazj.in>
+// Copyright (C) 2016-2019  Vincent Ambo <mail@tazj.in>
 //
 // Kontemplate is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
