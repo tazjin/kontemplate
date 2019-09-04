@@ -62,8 +62,7 @@ func LoadAndApplyTemplates(include *[]string, exclude *[]string, c *context.Cont
 func processResourceSet(ctx *context.Context, rs *context.ResourceSet) (*RenderedResourceSet, error) {
 	fmt.Fprintf(os.Stderr, "Loading resources for %s\n", rs.Name)
 
-	resourcePath := path.Join(ctx.BaseDir, rs.Path)
-	fileInfo, err := os.Stat(resourcePath)
+	fileInfo, err := os.Stat(rs.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -78,13 +77,13 @@ func processResourceSet(ctx *context.Context, rs *context.ResourceSet) (*Rendere
 		// list of files instead.
 		// This will end up printing a warning to the user, but it
 		// won't stop the rest of the process.
-		files, _ = ioutil.ReadDir(resourcePath)
+		files, _ = ioutil.ReadDir(rs.Path)
 		resources, err = processFiles(ctx, rs, files)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		resource, err := templateFile(ctx, rs, resourcePath)
+		resource, err := templateFile(ctx, rs, rs.Path)
 		if err != nil {
 			return nil, err
 		}
@@ -104,7 +103,7 @@ func processFiles(ctx *context.Context, rs *context.ResourceSet, files []os.File
 
 	for _, file := range files {
 		if !file.IsDir() && isResourceFile(file) {
-			path := path.Join(ctx.BaseDir, rs.Path, file.Name())
+			path := path.Join(rs.Path, file.Name())
 			res, err := templateFile(ctx, rs, path)
 
 			if err != nil {

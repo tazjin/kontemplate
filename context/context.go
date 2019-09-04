@@ -77,7 +77,7 @@ func LoadContext(filename string, explicitVars *[]string) (*Context, error) {
 	ctx.BaseDir = path.Dir(filename)
 
 	// Prepare the resource sets by resolving parents etc.
-	ctx.ResourceSets = flattenPrepareResourceSetPaths(&ctx.ResourceSets)
+	ctx.ResourceSets = flattenPrepareResourceSetPaths(&ctx.BaseDir, &ctx.ResourceSets)
 
 	// Add variables explicitly specified on the command line
 	ctx.ExplicitVars, err = loadExplicitVars(explicitVars)
@@ -136,7 +136,7 @@ func (ctx *Context) loadImportedVariables() (map[string]interface{}, error) {
 // collections, i.e. resource sets that themselves have an additional 'include' field set.
 // Those will be regarded as a short-hand for including multiple resource sets from a subfolder.
 // See https://github.com/tazjin/kontemplate/issues/9 for more information.
-func flattenPrepareResourceSetPaths(rs *[]ResourceSet) []ResourceSet {
+func flattenPrepareResourceSetPaths(baseDir *string, rs *[]ResourceSet) []ResourceSet {
 	flattened := make([]ResourceSet, 0)
 
 	for _, r := range *rs {
@@ -144,6 +144,12 @@ func flattenPrepareResourceSetPaths(rs *[]ResourceSet) []ResourceSet {
 		// This is also the classic behaviour prior to kontemplate 1.2
 		if r.Path == "" {
 			r.Path = r.Name
+		}
+
+		// Paths are made absolute by resolving them relative to the context base,
+		// unless absolute paths were specified.
+		if !path.IsAbs(r.Path) {
+			r.Path = path.Join(*baseDir, r.Path)
 		}
 
 		if len(r.Include) == 0 {
@@ -225,7 +231,7 @@ func loadDefaultValues(rs *ResourceSet, c *Context) *map[string]interface{} {
 	var defaultVars map[string]interface{}
 
 	for _, filename := range util.DefaultFilenames {
-		err := util.LoadData(path.Join(c.BaseDir, rs.Path, filename), &defaultVars)
+		err := util.LoadData(path.Join(rs.Path, filename), &defaultVars)
 		if err == nil {
 			return &defaultVars
 		}
