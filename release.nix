@@ -11,10 +11,10 @@
 # several different architectures and operating systems.
 
 let pkgs = import ((import <nixpkgs> {}).fetchFromGitHub {
-  owner  = "NixOS";
-  repo   = "nixpkgs";
-  rev    = "50f41ea2fcf86def32799f75577a4fe5cfd1132e";
-  sha256 = "1q0bxl5nxx1kabqvyzkdw91c5dnwpi2rwsgs5jdmnj7f0qqgdxh8";
+  owner = "NixOS";
+  repo = "nixpkgs-channels";
+  rev = "541d9cce8af7a490fb9085305939569567cb58e6";
+  sha256 = "0jgz72hhzkd5vyq5v69vpljjlnf0lqaz7fh327bvb3cvmwbfxrja";
 }) {};
 in with pkgs; buildGoPackage rec {
   name = "kontemplate-${version}";
