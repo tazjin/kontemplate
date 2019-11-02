@@ -100,6 +100,24 @@
     };
   }
   {
+    goPackagePath = "github.com/jinzhu/copier";
+    fetch = {
+      type = "git";
+      url = "https://github.com/jinzhu/copier";
+      rev = "b57f9002281ac48ed8cbc489b1e91121e1a0824c";
+      sha256 = "081fv66lsildg06bzi35canlxj41d1r8s7kysxkxiaci1n3pr053";
+    };
+  }
+  {
+    goPackagePath = "github.com/stretchr/testify";
+    fetch = {
+      type = "git";
+      url = "https://github.com/stretchr/testify";
+      rev = "85f2b59c4459e5bf57488796be8c3667cb8246d6";
+      sha256 = "19xjb0pqwks55src1lkxwvq2aq47bm3qlj3vwiw0xc0qc1rmbq5m";
+    };
+  }
+  {
     goPackagePath = "gopkg.in/yaml.v2";
     fetch = {
       type = "git";
