@@ -222,8 +222,6 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 			if err := mergo.Merge(&rsCopy.Values, params[0], mergo.WithOverride); err != nil {
 				return "", err
 			}
-			fmt.Println("copy", rsCopy)
-			fmt.Println("orig", rs)
 
 			data, err := templateFile(c, &rsCopy, path.Join(rs.Path, file))
 			if err != nil {
