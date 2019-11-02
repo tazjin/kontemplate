@@ -10,10 +10,11 @@
 package templater
 
 import (
-	"github.com/tazjin/kontemplate/context"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/tazjin/kontemplate/context"
 )
 
 func TestApplyNoLimits(t *testing.T) {
@@ -185,7 +186,7 @@ func TestInsertTemplateFunction(t *testing.T) {
 	resourceSet := context.ResourceSet{
 		Path: "testdata",
 		Values: map[string]interface{}{
-			"testName":        "TestInsertTemplateFunction",
+			"testName": "TestInsertTemplateFunction",
 		},
 	}
 
@@ -196,10 +197,36 @@ func TestInsertTemplateFunction(t *testing.T) {
 		t.Errorf("Templating with an insertTemplate call should have succeeded.\n")
 		t.Fail()
 	}
-
 	if res.Rendered != "Inserting \"Template for test TestInsertTemplateFunction\".\n" {
 		t.Error("Result does not contain expected rendered template value.")
 		t.Error(res.Rendered)
+		t.Fail()
+	}
+}
+
+func TestInsertTemplateFunctionWithArgs(t *testing.T) {
+	ctx := context.Context{}
+	resourceSet := context.ResourceSet{
+		Path: "testdata",
+		Values: map[string]interface{}{
+			"testName": "TestInsertTemplateFunctionWithArgs",
+			"foo":      "bar",
+		},
+	}
+
+	res, err := templateFile(&ctx, &resourceSet, "testdata/test-insertTemplateWithArgs.txt")
+
+	if err != nil {
+		t.Error(err)
+		t.Errorf("Templating with an insertTemplate call should have succeeded.\n")
+		t.Fail()
+	}
+
+	expected := "Overriding \"Template for test override\".\nOriginal \"Template for test TestInsertTemplateFunctionWithArgs\"."
+	if res.Rendered != expected {
+		t.Error("Result does not contain expected rendered template value.")
+		t.Error(res.Rendered)
+
 		t.Fail()
 	}
 }

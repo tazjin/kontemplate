@@ -1,0 +1,2 @@
+Overriding "{{ dict "testName" "override" | insertTemplate "test-template.txt" }}". 
+Original "{{ insertTemplate "test-template.txt" }}".

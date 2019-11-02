@@ -15,6 +15,20 @@ import (
 	"github.com/ghodss/yaml"
 )
 
+func CopyMap(m map[string]interface{}) map[string]interface{} {
+	cp := make(map[string]interface{})
+	for k, v := range m {
+		vm, ok := v.(map[string]interface{})
+		if ok {
+			cp[k] = CopyMap(vm)
+		} else {
+			cp[k] = v
+		}
+	}
+
+	return cp
+}
+
 // Filenames excluded from templating for the purpose of containing default variable values inside a resource set.
 var DefaultFilenames []string = []string{"default.yml", "default.yaml", "default.json"}
 

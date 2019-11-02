@@ -16,12 +16,13 @@ engine in addition to the cherry-picked features listed here.
 **Table of Contents**
 
 - [Kontemplate templates](#kontemplate-templates)
-    - [Basic variable interpolation](#basic-variable-interpolation)
-        - [Example:](#example)
-    - [Template functions](#template-functions)
-    - [Examples:](#examples)
-    - [Conditionals & ranges](#conditionals--ranges)
-    - [Caveats](#caveats)
+  - [Basic variable interpolation](#basic-variable-interpolation)
+    - [Example:](#example)
+  - [Template functions](#template-functions)
+  - [Examples:](#examples)
+  - [Conditionals & ranges](#conditionals--ranges)
+  - [InserTemplate with arguments](#insertemplate-with-arguments)
+  - [Caveats](#caveats)
 
 <!-- markdown-toc end -->
 
@@ -80,7 +81,7 @@ available in kontemplate, as well as five custom functions:
 * `insertFile`: Insert the contents of the given file in the resource
   set folder as a string.
 * `insertTemplate`: Insert the contents of the given template in the resource
-  set folder as a string.
+  set folder as a string. Takes in an optional dict that can be used in the template.
 
 ## Examples:
 
@@ -133,6 +134,54 @@ ports:
   {{ range .servicePorts }}
   - port: {{ . }}
   {{ end }}
+```
+
+## InserTemplate with arguments
+
+With the following values:
+
+```yml
+myValue: 0
+mySecondValue: 1
+nested:
+  myValue: foo
+  mySecondValue: bar
+```
+
+template.yml
+
+```yml
+foo: {{.myValue}}
+bar: {{.mySecondValue}}
+
+test.yml
+```yml
+value1:
+{{ insertTemplate "template.yml" | indent 2}}
+value2:
+{{ insertTemplate "template.yml" .nested | indent 2}}
+value3:
+{{ dict "myValue" 100 "mySecondValue" 101 | insertTemplate "template.yml" | indent 2}}
+value4:
+{{ dict "myValue" 1 "mySecondValue" 2 | insertTemplate "template.yml" | indent 2}}
+
+````
+
+output
+
+```yml
+value1:
+  foo: 0
+  bar: 1
+value2:
+  foo: foo
+  bar: ba
+value3:
+  foo: 100
+  bar: 101
+value4:
+  foo: 1
+  bar: 2
 ```
 
 Check out the Golang documentation (linked above) for more information about template logic.

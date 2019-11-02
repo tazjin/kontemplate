@@ -12,6 +12,7 @@ package templater
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -21,6 +22,8 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
+	"github.com/imdario/mergo"
+	"github.com/jinzhu/copier"
 	"github.com/tazjin/kontemplate/context"
 	"github.com/tazjin/kontemplate/util"
 )
@@ -204,7 +207,31 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 
 		return string(data), nil
 	}
-	m["insertTemplate"] = func(file string) (string, error) {
+	m["insertTemplate"] = func(file string, params ...map[string]interface{}) (string, error) {
+
+		if len(params) > 1 {
+			return "", errors.New("insertTemplate can only take a single param")
+		}
+
+		if len(params) == 1 {
+			rsCopy := context.ResourceSet{}
+			copier.Copy(&rsCopy, rs)
+			rsCopy.Values = map[string]interface{}{}
+			rsCopy.Values = util.CopyMap(rs.Values)
+
+			if err := mergo.Merge(&rsCopy.Values, params[0], mergo.WithOverride); err != nil {
+				return "", err
+			}
+			fmt.Println("copy", rsCopy)
+			fmt.Println("orig", rs)
+
+			data, err := templateFile(c, &rsCopy, path.Join(rs.Path, file))
+			if err != nil {
+				return "", err
+			}
+			return data.Rendered, nil
+		}
+
 		data, err := templateFile(c, rs, path.Join(rs.Path, file))
 		if err != nil {
 			return "", err
