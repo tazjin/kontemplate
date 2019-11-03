@@ -12,7 +12,6 @@ package templater
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -209,18 +208,15 @@ func templateFuncs(c *context.Context, rs *context.ResourceSet) template.FuncMap
 	}
 	m["insertTemplate"] = func(file string, params ...map[string]interface{}) (string, error) {
 
-		if len(params) > 1 {
-			return "", errors.New("insertTemplate can only take a single param")
-		}
-
-		if len(params) == 1 {
+		if len(params) > 0 {
 			rsCopy := context.ResourceSet{}
 			copier.Copy(&rsCopy, rs)
 			rsCopy.Values = map[string]interface{}{}
-			rsCopy.Values = util.CopyMap(rs.Values)
 
-			if err := mergo.Merge(&rsCopy.Values, params[0], mergo.WithOverride); err != nil {
-				return "", err
+			for _, param := range params {
+				if err := mergo.Merge(&rsCopy.Values, param, mergo.WithOverride); err != nil {
+					return "", err
+				}
 			}
 
 			data, err := templateFile(c, &rsCopy, path.Join(rs.Path, file))

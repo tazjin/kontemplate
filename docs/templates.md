@@ -138,6 +138,16 @@ ports:
 
 ## InserTemplate with arguments
 
+The insertTemplate-function first arguments is the file-path to the template.
+
+The rest of the arguments should be map-interfaces containing any value.
+These are the variables that will be available inside the template.
+
+The maps assigned will be merged, and ones to the right will take precedence.
+
+If no value is set for the rest-variables, it will default to the global scope.
+
+
 With the following values:
 
 ```yml
@@ -148,7 +158,7 @@ nested:
   mySecondValue: bar
 ```
 
-template.yml
+template.tp;
 
 ```yml
 foo: {{.myValue}}
@@ -157,13 +167,13 @@ bar: {{.mySecondValue}}
 test.yml
 ```yml
 value1:
-{{ insertTemplate "template.yml" | indent 2}}
+{{ insertTemplate "template.tpl" | indent 2}}
 value2:
-{{ insertTemplate "template.yml" .nested | indent 2}}
+{{ insertTemplate "template.tpl" .nested | indent 2}}
 value3:
-{{ dict "myValue" 100 "mySecondValue" 101 | insertTemplate "template.yml" | indent 2}}
+{{ dict "myValue" 100 "mySecondValue" 101 | insertTemplate "template.tpl" | indent 2}}
 value4:
-{{ dict "myValue" 1 "mySecondValue" 2 | insertTemplate "template.yml" | indent 2}}
+{{ dict "myValue" 1 "mySecondValue" 2 | insertTemplate "template.tpl" | indent 2}}
 
 ````
 
