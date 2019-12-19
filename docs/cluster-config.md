@@ -84,7 +84,7 @@ This field is **required**.
 
 As mentioned above, extra variables can be loaded from additional YAML or JSON files. Assuming you
 have a file called `test-secrets.yaml` which contains variables that should be shared between a `test`
-and `dev` cluster, you could include it in your context as such:
+and `dev` cluster, you could import it in your context as such:
 
 ```yaml
 # test-secrets.yaml:
@@ -92,12 +92,12 @@ mySecretVar: foo-bar-12345
 
 # test-cluster.yaml:
 context: k8s.test.mydomain.com
-include:
+import:
   - test-secrets.yaml
 
 # dev-cluster.yaml:
 context: k8s.dev.mydomain.com
-include:
+import:
   - test-secrets.yaml
 ```
 
