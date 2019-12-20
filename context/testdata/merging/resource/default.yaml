@@ -1,5 +1,0 @@
-defaultVar: defaultVar
-importVar: should be overridden (default)
-globalVar: should be overridden (default)
-includeVar: should be overridden (default)
-cliVar: should be overridden (default)

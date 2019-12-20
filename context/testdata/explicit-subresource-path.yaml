@@ -1,8 +1,0 @@
----
-context: k8s.prod.mydomain.com
-include:
-  - name: parent
-    path: parent-path
-    include:
-      - name: child
-        path: child-path

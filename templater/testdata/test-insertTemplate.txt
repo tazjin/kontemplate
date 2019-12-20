@@ -1,1 +1,0 @@
-Inserting "{{ insertTemplate "test-template.txt" | trim }}".
